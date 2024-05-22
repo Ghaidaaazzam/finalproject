@@ -1,0 +1,3 @@
+class Medication {
+  String name;
+}
