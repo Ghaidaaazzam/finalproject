@@ -40,16 +40,21 @@ class WelcomeScreen extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Image.asset('images/FinalLogo.png',
-                width: 150, height: 150), // Placeholder for logo image
+            Container(
+              alignment: Alignment.topCenter,
+              child:
+                  Image.asset('images/FinalLogo.png', width: 300, height: 500),
+            ), // Placeholder for logo image
             SizedBox(height: 20),
-            Text(
-              'Welcome to PillPoppin!',
-              style: TextStyle(
-                color: Colors.black,
-                fontSize: 24, // Adjust the font size as needed
-                fontWeight: FontWeight
-                    .bold, // You can adjust the font weight too if needed
+            Container(
+              child: Text(
+                'Welcome to PillPoppin!',
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 24, // Adjust the font size as needed
+                  fontWeight: FontWeight
+                      .bold, // You can adjust the font weight too if needed
+                ),
               ),
             ),
 
