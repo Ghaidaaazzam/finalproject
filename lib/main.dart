@@ -21,8 +21,10 @@ class PillPoppinApp extends StatelessWidget {
           onSurface: Color(0xFFB0BEC5), // Light Gray
         ),
         textTheme: TextTheme(
-          headline1: TextStyle(color: Color(0xFFB0BEC5)), // Light Gray
-          bodyText1: TextStyle(color: Color(0xFFB0BEC5)), // Light Gray
+          headline1:
+              TextStyle(color: Color.fromARGB(255, 0, 0, 0)), // Light Gray
+          bodyText1:
+              TextStyle(color: Color.fromARGB(255, 0, 0, 0)), // Light Gray
         ),
       ),
       home: WelcomeScreen(),
@@ -43,8 +45,14 @@ class WelcomeScreen extends StatelessWidget {
             SizedBox(height: 20),
             Text(
               'Welcome to PillPoppin!',
-              style: Theme.of(context).textTheme.headline4,
+              style: TextStyle(
+                color: Colors.black,
+                fontSize: 24, // Adjust the font size as needed
+                fontWeight: FontWeight
+                    .bold, // You can adjust the font weight too if needed
+              ),
             ),
+
             SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
