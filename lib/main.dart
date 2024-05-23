@@ -67,15 +67,15 @@ class WelcomeScreen extends StatelessWidget {
                 textAlign: TextAlign.center, // Center align the text
               ),
               SizedBox(height: 20), // Adjust the space between text and button
-              ElevatedButton(
-                onPressed: () {
+              GestureDetector(
+                onTap: () {
                   // Add navigation to next screen or functionality here
                 },
                 child: Container(
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: [
-                        Color.fromARGB(255, 238, 171, 194), // Pastel Pink
+                        Color.fromARGB(255, 244, 167, 193), // Pastel Pink
                         Color(0xFFF06292), // Slightly darker Pastel Pink
                       ],
                       begin: Alignment.topLeft,
@@ -92,7 +92,8 @@ class WelcomeScreen extends StatelessWidget {
                       ),
                     ],
                   ),
-                  padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                  padding: EdgeInsets.symmetric(
+                      horizontal: 16, vertical: 8), // Adjusted padding
                   child: Center(
                     child: Text(
                       'Let\'s get started!',
