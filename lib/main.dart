@@ -1,4 +1,6 @@
+// main.dart
 import 'package:flutter/material.dart';
+import 'LogInPage.dart'; // Import the LoginPage
 
 void main() {
   runApp(PillPoppinApp());
@@ -16,7 +18,7 @@ class PillPoppinApp extends StatelessWidget {
           background: Color.fromARGB(255, 217, 242, 255), // White
           surface: Color.fromARGB(255, 175, 227, 252), // Pastel Bright Blue
           onPrimary: Color(0xFFFFFFFF), // White
-          onSecondary: Color.fromARGB(255, 0, 0, 0), // White
+          onSecondary: Color.fromARGB(255, 0, 0, 0), // Black
           onBackground: Color(0xFFB0BEC5), // Light Gray
           onSurface: Color(0xFFB0BEC5), // Light Gray
         ),
@@ -52,16 +54,15 @@ class WelcomeScreen extends StatelessWidget {
                 style: TextStyle(
                   color: Colors.black,
                   fontSize: 24, // Adjust the font size as needed
-                  fontWeight: FontWeight
-                      .bold, // You can adjust the font weight too if needed
+                  fontWeight: FontWeight.bold, // Adjust font weight if needed
                 ),
               ),
               Text(
-                'keep your health in check,\n one pill at a time!',
+                'Keep your health in check,\n one pill at a time!',
                 style: TextStyle(
                   color: Color.fromARGB(255, 86, 87, 88),
                   fontFamily: 'Georgia', // Use Georgia font
-                  fontSize: 20, // Adjust the font size as needed
+                  fontSize: 20, // Adjust font size as needed
                   fontStyle: FontStyle.italic, // Apply italic style
                 ),
                 textAlign: TextAlign.center, // Center align the text
@@ -69,7 +70,10 @@ class WelcomeScreen extends StatelessWidget {
               SizedBox(height: 20), // Adjust the space between text and button
               GestureDetector(
                 onTap: () {
-                  // Add navigation to next screen or functionality here
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => LoginPage()),
+                  );
                 },
                 child: Container(
                   decoration: BoxDecoration(
@@ -106,7 +110,6 @@ class WelcomeScreen extends StatelessWidget {
                   ),
                 ),
               ),
-
               SizedBox(height: 50), // Add some bottom margin if needed
             ],
           ),
