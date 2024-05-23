@@ -17,6 +17,8 @@ class LoginPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor:
+          Color.fromARGB(255, 217, 242, 255), // Set background color
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -24,7 +26,6 @@ class LoginPage extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Image.asset('images/FinalLogo.png'),
-              SizedBox(height: 20),
               SizedBox(height: 20),
               TextField(
                 decoration: InputDecoration(
