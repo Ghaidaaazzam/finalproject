@@ -71,17 +71,41 @@ class WelcomeScreen extends StatelessWidget {
                 onPressed: () {
                   // Add navigation to next screen or functionality here
                 },
-                style: ElevatedButton.styleFrom(
-                  alignment: Alignment.bottomCenter,
-                  backgroundColor:
-                      Theme.of(context).colorScheme.secondary, // Pastel Pink
-                  foregroundColor:
-                      Theme.of(context).colorScheme.onSecondary, // White
-                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                  textStyle: TextStyle(fontSize: 16),
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        Color.fromARGB(255, 238, 171, 194), // Pastel Pink
+                        Color(0xFFF06292), // Slightly darker Pastel Pink
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      stops: [0.1, 1.0],
+                    ),
+                    borderRadius: BorderRadius.circular(30.0),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black26,
+                        offset: Offset(0, 4),
+                        blurRadius: 4.0,
+                        spreadRadius: 1.0,
+                      ),
+                    ],
+                  ),
+                  padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                  child: Center(
+                    child: Text(
+                      'Let\'s get started!',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: const Color.fromARGB(255, 0, 0, 0),
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
                 ),
-                child: Text('Let\'s get started!'),
               ),
+
               SizedBox(height: 50), // Add some bottom margin if needed
             ],
           ),
