@@ -65,7 +65,7 @@ class WelcomeScreen extends StatelessWidget {
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor:
-                    Theme.of(context).colorScheme.primary, // Pastel Blue
+                    Theme.of(context).colorScheme.secondary, // Pastel Blue
                 foregroundColor:
                     Theme.of(context).colorScheme.onPrimary, // White
                 padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
