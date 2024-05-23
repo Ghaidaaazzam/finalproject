@@ -23,7 +23,7 @@ class LoginPage extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Image.asset('images/FinalLogoWithoutBackground.png'),
+              Image.asset('images/FinalLogo.png'),
               SizedBox(height: 20),
               SizedBox(height: 20),
               TextField(
