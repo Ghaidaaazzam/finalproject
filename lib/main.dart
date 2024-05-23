@@ -12,9 +12,9 @@ class PillPoppinApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.light(
           primary: Color(0xFFA8DADC), // Pastel Blue
-          secondary: Color.fromARGB(255, 250, 157, 174), // Pastel Pink
-          background: Color.fromARGB(255, 255, 205, 234), // White
-          surface: Color(0xFFB3E5FC), // Pastel Bright Blue
+          secondary: Color(0xFFFF9DC6), // Pastel Pink
+          background: Color.fromARGB(255, 217, 242, 255), // White
+          surface: Color.fromARGB(255, 175, 227, 252), // Pastel Bright Blue
           onPrimary: Color(0xFFFFFFFF), // White
           onSecondary: Color.fromARGB(255, 0, 0, 0), // White
           onBackground: Color(0xFFB0BEC5), // Light Gray
