@@ -13,7 +13,7 @@ class PillPoppinApp extends StatelessWidget {
         colorScheme: ColorScheme.light(
           primary: Color(0xFFA8DADC), // Pastel Blue
           secondary: Color(0xFFFFC1CC), // Pastel Pink
-          background: Color(0xFFFFFFFF), // Pastel White
+          background: Color(0xFFFFFFFF), // White
           surface: Color(0xFFB3E5FC), // Pastel Bright Blue
           onPrimary: Color(0xFFFFFFFF), // White
           onSecondary: Color(0xFFFFFFFF), // White
@@ -21,10 +21,8 @@ class PillPoppinApp extends StatelessWidget {
           onSurface: Color(0xFFB0BEC5), // Light Gray
         ),
         textTheme: TextTheme(
-          headline1:
-              TextStyle(color: Color.fromARGB(255, 0, 0, 0)), // Light Gray
-          bodyText1:
-              TextStyle(color: Color.fromARGB(255, 0, 0, 0)), // Light Gray
+          headline1: TextStyle(color: Color(0xFF000000)), // Black
+          bodyText1: TextStyle(color: Color(0xFF000000)), // Black
         ),
       ),
       home: WelcomeScreen(),
@@ -36,45 +34,53 @@ class WelcomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Container(
-              alignment: Alignment.topCenter,
-              child:
-                  Image.asset('images/FinalLogo.png', width: 300, height: 500),
-            ), // Placeholder for logo image
-            SizedBox(height: 20),
-            Container(
-              child: Text(
-                'Welcome to PillPoppin!',
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 24, // Adjust the font size as needed
-                  fontWeight: FontWeight
-                      .bold, // You can adjust the font weight too if needed
-                ),
-              ),
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: <Widget>[
+          Container(
+            alignment: Alignment.topCenter,
+            margin: EdgeInsets.only(top: 50), // Add some top margin if needed
+            child: Image.asset('images/FinalLogo.png',
+                width: 500, height: 300), // Adjusted size
+          ),
+          SizedBox(height: 20),
+          Text(
+            'Welcome to PillPoppin!',
+            style: TextStyle(
+              color: Colors.black,
+              fontSize: 24, // Adjust the font size as needed
+              fontWeight: FontWeight
+                  .bold, // You can adjust the font weight too if needed
             ),
-
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
-                // Add navigation to next screen or functionality here
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor:
-                    Theme.of(context).colorScheme.secondary, // Pastel Blue
-                foregroundColor:
-                    Theme.of(context).colorScheme.onPrimary, // White
-                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                textStyle: TextStyle(fontSize: 16),
-              ),
-              child: Text('Let\'s get started!'),
+          ),
+          Text(
+            'keep your health in check, one pill at a time!',
+            style: TextStyle(
+              fontFamily: 'Georgia', // Use Georgia font
+              fontSize: 18, // Adjust the font size as needed
+              fontStyle: FontStyle.italic, // Apply italic style
             ),
-          ],
-        ),
+            textAlign: TextAlign.center, // Center align the text
+          ),
+          SizedBox(height: 20), // Adjust the space between text and button
+          ElevatedButton(
+            onPressed: () {
+              // Add navigation to next screen or functionality here
+            },
+            style: ElevatedButton.styleFrom(
+              alignment: Alignment.bottomCenter,
+              backgroundColor:
+                  Theme.of(context).colorScheme.secondary, // Pastel Pink
+              foregroundColor:
+                  Theme.of(context).colorScheme.onSecondary, // White
+              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              textStyle: TextStyle(fontSize: 16),
+            ),
+            child: Text('Let\'s get started!'),
+          ),
+          SizedBox(height: 50), // Add some bottom margin if needed
+        ],
       ),
     );
   }
