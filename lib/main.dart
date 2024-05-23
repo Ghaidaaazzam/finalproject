@@ -57,8 +57,9 @@ class WelcomeScreen extends StatelessWidget {
           Text(
             'keep your health in check,\n one pill at a time!',
             style: TextStyle(
+              color: Color.fromARGB(255, 86, 87, 88),
               fontFamily: 'Georgia', // Use Georgia font
-              fontSize: 18, // Adjust the font size as needed
+              fontSize: 20, // Adjust the font size as needed
               fontStyle: FontStyle.italic, // Apply italic style
             ),
             textAlign: TextAlign.center, // Center align the text
