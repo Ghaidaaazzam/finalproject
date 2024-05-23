@@ -1,4 +1,3 @@
-// main.dart
 import 'package:flutter/material.dart';
 import 'LogInPage.dart'; // Import the LoginPage
 
@@ -68,43 +67,46 @@ class WelcomeScreen extends StatelessWidget {
                 textAlign: TextAlign.center, // Center align the text
               ),
               SizedBox(height: 20), // Adjust the space between text and button
-              GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => LoginPage()),
-                  );
-                },
-                child: Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        Color.fromARGB(255, 244, 167, 193), // Pastel Pink
-                        Color(0xFFF06292), // Slightly darker Pastel Pink
-                      ],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      stops: [0.1, 1.0],
-                    ),
-                    borderRadius: BorderRadius.circular(30.0),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black26,
-                        offset: Offset(0, 4),
-                        blurRadius: 4.0,
-                        spreadRadius: 1.0,
+              Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => LoginPage()),
+                    );
+                  },
+                  borderRadius: BorderRadius.circular(30.0),
+                  child: Ink(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          Color.fromARGB(255, 244, 167, 193), // Pastel Pink
+                          Color(0xFFF06292), // Slightly darker Pastel Pink
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        stops: [0.1, 1.0],
                       ),
-                    ],
-                  ),
-                  padding: EdgeInsets.symmetric(
-                      horizontal: 16, vertical: 8), // Adjusted padding
-                  child: Center(
-                    child: Text(
-                      'Let\'s get started!',
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: const Color.fromARGB(255, 0, 0, 0),
-                        fontWeight: FontWeight.bold,
+                      borderRadius: BorderRadius.circular(30.0),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black26,
+                          offset: Offset(0, 4),
+                          blurRadius: 4.0,
+                          spreadRadius: 1.0,
+                        ),
+                      ],
+                    ),
+                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    child: Center(
+                      child: Text(
+                        'Let\'s get started!',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: const Color.fromARGB(255, 0, 0, 0),
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                   ),
