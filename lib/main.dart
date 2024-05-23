@@ -55,7 +55,7 @@ class WelcomeScreen extends StatelessWidget {
             ),
           ),
           Text(
-            'keep your health in check, one pill at a time!',
+            'keep your health in check,\n one pill at a time!',
             style: TextStyle(
               fontFamily: 'Georgia', // Use Georgia font
               fontSize: 18, // Adjust the font size as needed
