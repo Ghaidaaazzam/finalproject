@@ -12,11 +12,11 @@ class PillPoppinApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.light(
           primary: Color(0xFFA8DADC), // Pastel Blue
-          secondary: Color.fromARGB(255, 240, 145, 162), // Pastel Pink
+          secondary: Color(0xFFFFC1CC), // Pastel Pink
           background: Color(0xFFFFFFFF), // White
           surface: Color(0xFFB3E5FC), // Pastel Bright Blue
           onPrimary: Color(0xFFFFFFFF), // White
-          onSecondary: Color.fromARGB(255, 0, 0, 0), // White
+          onSecondary: Color(0xFFFFFFFF), // White
           onBackground: Color(0xFFB0BEC5), // Light Gray
           onSurface: Color(0xFFB0BEC5), // Light Gray
         ),
@@ -35,12 +35,12 @@ class WelcomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.start, // Align to the top
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
           Container(
             alignment: Alignment.topCenter,
-            margin: EdgeInsets.only(top: 50), // Add some top margin if needed
+            margin: EdgeInsets.only(top: 100), // Increased top margin
             child: Image.asset('images/FinalLogo.png',
                 width: 500, height: 300), // Adjusted size
           ),
