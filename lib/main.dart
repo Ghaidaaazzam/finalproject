@@ -1,72 +1,67 @@
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(PillPoppinApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
-
-  // This widget is the root of your application.
+class PillPoppinApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'PillPoppin',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
+        colorScheme: ColorScheme.light(
+          primary: Color(0xFFA8DADC), // Pastel Blue
+          secondary: Color(0xFFFFC1CC), // Pastel Pink
+          background: Color(0xFFFFFFFF), // Pastel White
+          surface: Color(0xFFB3E5FC), // Pastel Bright Blue
+          onPrimary: Color(0xFFFFFFFF), // White
+          onSecondary: Color(0xFFFFFFFF), // White
+          onBackground: Color(0xFFB0BEC5), // Light Gray
+          onSurface: Color(0xFFB0BEC5), // Light Gray
+        ),
+        textTheme: TextTheme(
+          headline1: TextStyle(color: Color(0xFFB0BEC5)), // Light Gray
+          bodyText1: TextStyle(color: Color(0xFFB0BEC5)), // Light Gray
+        ),
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: WelcomeScreen(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key, required this.title}) : super(key: key);
-
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
-
+class WelcomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
-      ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
-            ),
+            Image.asset('images/FinalLogo.png',
+                width: 150, height: 150), // Placeholder for logo image
+            SizedBox(height: 20),
             Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
+              'Welcome to PillPoppin!',
+              style: Theme.of(context).textTheme.headline4,
             ),
-            const SizedBox(
-                height: 20), // Add some space between the counter and the image
-            Image.asset('images/SmallLogo.jpg'), // Display the image
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                // Add navigation to next screen or functionality here
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor:
+                    Theme.of(context).colorScheme.primary, // Pastel Blue
+                foregroundColor:
+                    Theme.of(context).colorScheme.onPrimary, // White
+                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                textStyle: TextStyle(fontSize: 16),
+              ),
+              child: Text('Let\'s get started!'),
+            ),
           ],
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
       ),
     );
   }
