@@ -1,3 +1,3 @@
 class Medication {
-  String name;
+  //String name;
 }

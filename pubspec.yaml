@@ -18,3 +18,6 @@ dev_dependencies:
 
 # Add additional dev dependencies here
 
+flutter:
+  assets:
+    - images/
