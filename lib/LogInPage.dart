@@ -13,26 +13,33 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class LoginPage extends StatelessWidget {
+class LoginPage extends StatefulWidget {
+  @override
+  _LoginPageState createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  // Define a common text style
+  TextStyle commonTextStyle = TextStyle(
+    color: Colors.blueGrey[900],
+    fontSize: 20,
+    fontWeight: FontWeight.w600,
+    fontStyle: FontStyle.italic,
+  );
+
+  // Define a common border style
+  OutlineInputBorder commonBorder = OutlineInputBorder(
+    borderRadius: BorderRadius.circular(8),
+    borderSide: BorderSide(color: Colors.black),
+  );
+
+  // Define the forgot password button color
+  Color _forgotPasswordButtonColor = Color.fromARGB(255, 24, 0, 162)!;
+
   @override
   Widget build(BuildContext context) {
-    // Define a common text style
-    TextStyle commonTextStyle = TextStyle(
-      color: Colors.blueGrey[900], // Darker shade of blue-grey for text
-      fontSize: 20, // Increased font size for better readability
-      fontWeight: FontWeight.w600, // Semi-bold weight
-      fontStyle: FontStyle.italic, // Italic style for a creative touch
-    );
-
-    // Define a common border style
-    OutlineInputBorder commonBorder = OutlineInputBorder(
-      borderRadius: BorderRadius.circular(8),
-      borderSide: BorderSide(color: Colors.black), // Set border color to black
-    );
-
     return Scaffold(
-      backgroundColor:
-          Color.fromARGB(255, 217, 242, 255), // Set background color
+      backgroundColor: Color.fromARGB(255, 217, 242, 255),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -45,9 +52,8 @@ class LoginPage extends StatelessWidget {
                 decoration: InputDecoration(
                   labelText: 'Enter your Email',
                   labelStyle: commonTextStyle,
-                  border: commonBorder, // Apply common border style
-                  prefixIcon: Icon(Icons.email,
-                      color: Colors.black), // Icon color set to black
+                  border: commonBorder,
+                  prefixIcon: Icon(Icons.email, color: Colors.black),
                 ),
               ),
               SizedBox(height: 20),
@@ -55,27 +61,31 @@ class LoginPage extends StatelessWidget {
                 decoration: InputDecoration(
                   labelText: 'Enter your Password',
                   labelStyle: commonTextStyle,
-                  border: commonBorder, // Apply common border style
-                  prefixIcon: Icon(Icons.lock,
-                      color: Colors.black), // Icon color set to black
+                  border: commonBorder,
+                  prefixIcon: Icon(Icons.lock, color: Colors.black),
                 ),
                 obscureText: true,
               ),
               SizedBox(height: 10),
               Align(
                 alignment: Alignment.centerRight,
-                child: TextButton(
+                child: TextButton.icon(
+                  icon: Icon(Icons.vpn_key,
+                      color: _forgotPasswordButtonColor), // Added icon
+                  label: Text(
+                    'Forgot Password?',
+                    style: TextStyle(
+                      decoration: TextDecoration.underline,
+                      color: _forgotPasswordButtonColor,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                   onPressed: () {
                     // Handle forgot password
                   },
-                  child: Text(
-                    'Forgot Password?',
-                    style: commonTextStyle.copyWith(
-                      color:
-                          Colors.blueAccent, // Blue accent color for the button
-                      fontStyle:
-                          FontStyle.normal, // Normal font style for the button
-                    ),
+                  style: TextButton.styleFrom(
+                    padding: EdgeInsets.zero,
                   ),
                 ),
               ),
@@ -114,7 +124,7 @@ class LoginPage extends StatelessWidget {
                         'Log In',
                         style: TextStyle(
                           fontSize: 18,
-                          color: Colors.black, // Text color set to black
+                          color: Colors.black,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
