@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 void main() {
   runApp(MyApp());
@@ -8,6 +9,45 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      localizationsDelegates: [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+      ],
+      supportedLocales: [
+        const Locale('en', 'US'), // English (US)
+        const Locale('en', 'GB'), // English (UK)
+      ],
+      locale: const Locale(
+          'en', 'GB'), // Set the locale to UK English for 24-hour format
+      theme: ThemeData(
+        timePickerTheme: TimePickerThemeData(
+          backgroundColor: Color(0xFFF8E1E9), // Light pastel pink
+          hourMinuteTextColor: Colors.black,
+          hourMinuteColor: Color(0xFFF06292), // Slightly darker pastel pink
+          dialHandColor: Color(0xFFF06292),
+          dialBackgroundColor: Colors.white,
+          entryModeIconColor: Color(0xFFF06292),
+          helpTextStyle: TextStyle(
+            color: Colors.black,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
+          hourMinuteTextStyle: TextStyle(
+            color: Colors.black,
+            fontSize: 32,
+            fontWeight: FontWeight.bold,
+          ),
+          dialTextColor: MaterialStateColor.resolveWith((states) =>
+              states.contains(MaterialState.selected)
+                  ? Colors.white
+                  : Colors.black),
+          inputDecorationTheme: InputDecorationTheme(
+            focusedBorder: UnderlineInputBorder(
+              borderSide: BorderSide(color: Color(0xFFF06292)),
+            ),
+          ),
+        ),
+      ),
       home: WakeUpTimeScreen(),
     );
   }
@@ -25,6 +65,23 @@ class _WakeUpTimeScreenState extends State<WakeUpTimeScreen> {
     final TimeOfDay? picked = await showTimePicker(
       context: context,
       initialTime: _selectedTime,
+      builder: (BuildContext context, Widget? child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: ColorScheme.light(
+              primary: Color(0xFFF06292), // header background color
+              onPrimary: Colors.white, // header text color
+              onSurface: Colors.black, // body text color
+            ),
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.black, // button text color
+              ),
+            ),
+          ),
+          child: child!,
+        );
+      },
     );
     if (picked != null && picked != _selectedTime) {
       setState(() {
@@ -45,8 +102,7 @@ class _WakeUpTimeScreenState extends State<WakeUpTimeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Wake Up Time Picker'),
-        backgroundColor: Color.fromARGB(255, 24, 0, 162),
+        backgroundColor: Color.fromARGB(255, 217, 242, 255),
       ),
       backgroundColor: Color.fromARGB(255, 217, 242, 255),
       body: Center(
@@ -76,7 +132,8 @@ class _WakeUpTimeScreenState extends State<WakeUpTimeScreen> {
                     children: [
                       Text(
                         "${_selectedTime.hour.toString().padLeft(2, '0')}:${_selectedTime.minute.toString().padLeft(2, '0')}",
-                        style: TextStyle(fontSize: 18.0),
+                        style: TextStyle(
+                            fontSize: 18.0, fontWeight: FontWeight.bold),
                       ),
                       Icon(
                         Icons.arrow_drop_down,
