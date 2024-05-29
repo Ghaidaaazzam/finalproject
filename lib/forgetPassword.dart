@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'ResetPassword.dart'; // Import the ResetPassword page
 
 void main() {
   runApp(MyApp());
@@ -26,7 +27,7 @@ class ForgotPassword extends StatelessWidget {
             children: [
               Image.asset(
                 'images/FinalLogo.png',
-                height: 200,
+                height: 300, // Increased the height to make the image bigger
               ),
               TextField(
                 decoration: InputDecoration(
@@ -54,82 +55,134 @@ class ForgotPassword extends StatelessWidget {
                 style: TextStyle(
                     color: Colors.black), // Input text color set to black
               ),
-
               SizedBox(height: 20),
               Padding(
                 padding: const EdgeInsets.all(50.0),
                 child: Container(
                   height: 50,
-                  child: Material(
-                    color: Colors.transparent,
-                    child: InkWell(
-                      onTap: () {
-                        // Add navigation logic here
-                      },
-                      borderRadius: BorderRadius.circular(30.0),
-                      child: Ink(
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [
-                              Color.fromARGB(255, 244, 167, 193),
-                              Color(0xFFF06292),
+                  child: CustomButton(
+                    text: 'Send Reset Code',
+                    fontSize: 18,
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            backgroundColor: Color.fromARGB(255, 217, 242, 255),
+                            title: Text(
+                              'Enter the code sent to your email',
+                              style: TextStyle(color: Colors.black),
+                            ),
+                            content: TextField(
+                              decoration: InputDecoration(
+                                labelText: 'Verification Code',
+                                labelStyle: TextStyle(color: Colors.black),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(color: Colors.black),
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(color: Colors.black),
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                              ),
+                              style: TextStyle(color: Colors.black),
+                            ),
+                            actions: [
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Expanded(
+                                    child: CustomButton(
+                                      text: 'Cancel',
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                      },
+                                    ),
+                                  ),
+                                  SizedBox(width: 10),
+                                  Expanded(
+                                    child: CustomButton(
+                                      text: 'Submit',
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  ResetPassword()),
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            stops: [0.1, 1.0],
-                          ),
-                          borderRadius: BorderRadius.circular(30.0),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black26,
-                              offset: Offset(0, 4),
-                              blurRadius: 4.0,
-                              spreadRadius: 1.0,
-                            ),
-                          ],
-                        ),
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                        child: Center(
-                          child: Text(
-                            'Send Reset Code',
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: const Color.fromARGB(255, 0, 0, 0),
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
+                          );
+                        },
+                      );
+                    },
                   ),
                 ),
               ),
               SizedBox(height: 20),
-              // Align(
-              //   alignment: Alignment.centerLeft,
-              //   child: TextButton(
-              //     onPressed: () {
-              //       Navigator.pop(context); // Navigate back to the login page
-              //     },
-              //     child: Row(
-              //       mainAxisSize:
-              //           MainAxisSize.min, // To align the icon and text properly
-              //       children: <Widget>[
-              //         Icon(Icons.arrow_back,
-              //             color: Colors.black), // Back Icon with black color
-              //         SizedBox(width: 8), // Space between icon and text
-              //         Text(
-              //           'Back to Login',
-              //           style: TextStyle(
-              //               color: Colors.black), // Text color set to black
-              //         ),
-              //       ],
-              //     ),
-              //   ),
-              // ),
-              // SizedBox(height: 10),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class CustomButton extends StatelessWidget {
+  final String text;
+  final VoidCallback onPressed;
+  final double fontSize;
+
+  CustomButton(
+      {required this.text, required this.onPressed, this.fontSize = 14});
+
+  @override
+  Widget build(BuildContext context) {
+    return Ink(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            Color.fromARGB(255, 244, 167, 193),
+            Color(0xFFF06292),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          stops: [0.1, 1.0],
+        ),
+        borderRadius: BorderRadius.circular(30.0),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black26,
+            offset: Offset(0, 4),
+            blurRadius: 4.0,
+            spreadRadius: 1.0,
+          ),
+        ],
+      ),
+      child: InkWell(
+        onTap: onPressed,
+        borderRadius: BorderRadius.circular(30.0),
+        child: Container(
+          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+          child: Center(
+            child: Text(
+              text,
+              style: TextStyle(
+                fontSize: fontSize,
+                color: const Color.fromARGB(255, 0, 0, 0),
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ),
         ),
       ),
