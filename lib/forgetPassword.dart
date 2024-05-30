@@ -73,24 +73,7 @@ class ForgotPassword extends StatelessWidget {
                               'Enter the code sent to your email',
                               style: TextStyle(color: Colors.black),
                             ),
-                            content: TextField(
-                              decoration: InputDecoration(
-                                labelText: 'Verification Code',
-                                labelStyle: TextStyle(color: Colors.black),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(8.0),
-                                ),
-                                enabledBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(color: Colors.black),
-                                  borderRadius: BorderRadius.circular(8.0),
-                                ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(color: Colors.black),
-                                  borderRadius: BorderRadius.circular(8.0),
-                                ),
-                              ),
-                              style: TextStyle(color: Colors.black),
-                            ),
+                            content: VerificationCodeInput(),
                             actions: [
                               Row(
                                 mainAxisAlignment:
@@ -134,6 +117,68 @@ class ForgotPassword extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class VerificationCodeInput extends StatefulWidget {
+  @override
+  _VerificationCodeInputState createState() => _VerificationCodeInputState();
+}
+
+class _VerificationCodeInputState extends State<VerificationCodeInput> {
+  List<FocusNode> _focusNodes = List.generate(4, (index) => FocusNode());
+  List<TextEditingController> _controllers =
+      List.generate(4, (index) => TextEditingController());
+
+  @override
+  void dispose() {
+    for (var node in _focusNodes) {
+      node.dispose();
+    }
+    for (var controller in _controllers) {
+      controller.dispose();
+    }
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        for (var i = 0; i < 4; i++)
+          Container(
+            width: 40,
+            child: TextField(
+              controller: _controllers[i],
+              focusNode: _focusNodes[i],
+              maxLength: 1,
+              decoration: InputDecoration(
+                counterText: '',
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.black),
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.black),
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+              ),
+              style: TextStyle(color: Colors.black),
+              textAlign: TextAlign.center,
+              keyboardType: TextInputType.number,
+              onChanged: (value) {
+                if (value.length == 1 && i < 3) {
+                  FocusScope.of(context).requestFocus(_focusNodes[i + 1]);
+                }
+                if (value.isEmpty && i > 0) {
+                  FocusScope.of(context).requestFocus(_focusNodes[i - 1]);
+                }
+              },
+            ),
+          ),
+      ],
     );
   }
 }
