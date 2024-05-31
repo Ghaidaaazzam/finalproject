@@ -79,6 +79,11 @@ class UserProfile extends StatelessWidget {
               press: () {},
             ),
             ProfileMenuItem(
+              icon: Icons.favorite,
+              text: 'Favorite',
+              press: () {},
+            ),
+            ProfileMenuItem(
               icon: Icons.lock,
               text: 'Password Manager',
               press: () {},
