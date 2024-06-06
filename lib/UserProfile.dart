@@ -61,7 +61,7 @@ class UserProfile extends StatelessWidget {
                   child: Icon(
                     Icons.edit,
                     size: 20,
-                    color: Colors.blue,
+                    color: Colors.black, // Change to black
                   ),
                 ),
               ),
@@ -182,10 +182,11 @@ class ProfileMenuItem extends StatelessWidget {
         onPressed: press,
         child: Row(
           children: [
-            Icon(icon, color: Color(0xFFA8DADC)),
+            Icon(icon, color: Colors.black), // Change to black
             SizedBox(width: 20),
             Expanded(child: Text(text, style: TextStyle(color: Colors.black))),
-            Icon(Icons.arrow_forward_ios, color: Color(0xFFA8DADC)),
+            Icon(Icons.arrow_forward_ios,
+                color: Colors.black), // Change to black
           ],
         ),
       ),

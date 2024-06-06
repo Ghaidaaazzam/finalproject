@@ -67,7 +67,7 @@ class EditProfilePage extends StatelessWidget {
                   child: Icon(
                     Icons.edit,
                     size: 20,
-                    color: Colors.blue,
+                    color: Colors.black, // Changed to black
                   ),
                 ),
               ),
