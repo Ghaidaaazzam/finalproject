@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'FavoritePage.dart'; // Import the FavoritePage
 
 void main() {
   runApp(MyApp());
@@ -49,7 +50,7 @@ class UserProfile extends StatelessWidget {
             SizedBox(height: 20),
             CircleAvatar(
               radius: 50,
-              backgroundImage: AssetImage('assets/images/your_photo.png'),
+              // backgroundImage: AssetImage('assets/images/your_photo.png'),
               child: Align(
                 alignment: Alignment.bottomRight,
                 child: CircleAvatar(
@@ -81,7 +82,41 @@ class UserProfile extends StatelessWidget {
             ProfileMenuItem(
               icon: Icons.favorite,
               text: 'Favorite',
-              press: () {},
+              press: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => FavoritePage(
+                      userAnswers: {
+                        'What time do you wake up in the morning?':
+                            TimeOfDay(hour: 7, minute: 0),
+                        'At what time do you have breakfast?':
+                            TimeOfDay(hour: 8, minute: 0),
+                        'What time do you have lunch?':
+                            TimeOfDay(hour: 12, minute: 0),
+                        'What time do you have dinner?':
+                            TimeOfDay(hour: 18, minute: 0),
+                        'What time do you go to bed at night?':
+                            TimeOfDay(hour: 22, minute: 0),
+                      },
+                      questions: [
+                        'What time do you wake up in the morning?',
+                        'At what time do you have breakfast?',
+                        'What time do you have lunch?',
+                        'What time do you have dinner?',
+                        'What time do you go to bed at night?',
+                      ],
+                      images: [
+                        'images/sun.png', // Icon for waking up
+                        'images/coffee.png', // Icon for breakfast
+                        'images/launch.png', // Icon for lunch
+                        'images/dinner.png', // Icon for dinner
+                        'images/moon.png', // Icon for going to bed
+                      ],
+                    ),
+                  ),
+                );
+              },
             ),
             ProfileMenuItem(
               icon: Icons.lock,
