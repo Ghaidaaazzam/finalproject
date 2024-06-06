@@ -78,23 +78,43 @@ class EditProfilePage extends StatelessWidget {
             buildTextField('Email', 'johndoe@example.com'),
             buildTextField('Date Of Birth', 'DD / MM / YYYY'),
             SizedBox(height: 30),
-            ElevatedButton(
-              onPressed: () {
-                // Handle update profile button press
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Color(0xFF1E88E5), // Blue
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30.0),
+            Ink(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Color.fromARGB(255, 244, 167, 193), // Pastel Pink
+                    Color(0xFFF06292), // Slightly darker Pastel Pink
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  stops: [0.1, 1.0],
                 ),
-                padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                borderRadius: BorderRadius.circular(30.0),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black26,
+                    offset: Offset(0, 4),
+                    blurRadius: 4.0,
+                    spreadRadius: 1.0,
+                  ),
+                ],
               ),
-              child: Text(
-                'Update Profile',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
+              child: InkWell(
+                onTap: () {
+                  // Handle update profile button press
+                },
+                borderRadius: BorderRadius.circular(30.0),
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                  child: Text(
+                    'Update Profile',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
                 ),
               ),
             ),

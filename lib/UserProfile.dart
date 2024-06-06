@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'FavoritePage.dart'; // Import the FavoritePage
+import 'EditProfilePage.dart'; // Import the EditProfilePage
+import 'ResetPassword.dart'; // Import the ResetPassword
 
 void main() {
   runApp(MyApp());
@@ -77,7 +79,14 @@ class UserProfile extends StatelessWidget {
             ProfileMenuItem(
               icon: Icons.person,
               text: 'Profile',
-              press: () {},
+              press: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => EditProfilePage(),
+                  ),
+                );
+              },
             ),
             ProfileMenuItem(
               icon: Icons.favorite,
@@ -121,7 +130,14 @@ class UserProfile extends StatelessWidget {
             ProfileMenuItem(
               icon: Icons.lock,
               text: 'Password Manager',
-              press: () {},
+              press: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ResetPassword(),
+                  ),
+                );
+              },
             ),
             ProfileMenuItem(
               icon: Icons.help,
