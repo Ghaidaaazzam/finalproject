@@ -19,34 +19,27 @@ class AddPatientPage extends StatefulWidget {
 }
 
 class _AddPatientPageState extends State<AddPatientPage> {
-  // Define a common text style
-  TextStyle commonTextStyle = TextStyle(
-    color: Colors.blueGrey[900],
-    fontSize: 20,
-    fontWeight: FontWeight.w600,
-    fontStyle: FontStyle.italic,
-  );
-
-  // Define a common border style
-  OutlineInputBorder commonBorder = OutlineInputBorder(
-    borderRadius: BorderRadius.circular(8),
-    borderSide: BorderSide(color: Colors.black),
-  );
-
   int _selectedIndex = 2;
 
   void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-    // Handle navigation based on the index
+    switch (index) {
+      case 0:
+        Navigator.pushNamed(context, '/');
+        break;
+      case 1:
+        Navigator.pushNamed(context, '/prescription');
+        break;
+      case 2:
+        Navigator.pushNamed(context, '/addPatient');
+        break;
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Color.fromARGB(255, 217, 242, 255),
-      appBar: null, // Remove the AppBar
+      appBar: null,
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -60,50 +53,77 @@ class _AddPatientPageState extends State<AddPatientPage> {
                     'Add Patient',
                     style: TextStyle(
                       color: Colors.black,
-                      fontSize: 36, // Increased font size
+                      fontSize: 36,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SizedBox(height: 40), // Increased spacing
+                  SizedBox(height: 40),
                   TextField(
                     keyboardType: TextInputType.number,
                     decoration: InputDecoration(
                       labelText: 'Enter Patient ID',
-                      labelStyle: commonTextStyle,
-                      border: commonBorder,
-                      focusedBorder: commonBorder.copyWith(
+                      labelStyle: TextStyle(
+                        color: Colors.blueGrey[900],
+                        fontSize: 20,
+                        fontWeight: FontWeight.w600,
+                        fontStyle: FontStyle.italic,
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide(color: Colors.black),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
                         borderSide: BorderSide(color: Colors.black),
                       ),
                       prefixIcon:
                           Icon(Icons.perm_identity, color: Colors.black),
                     ),
                   ),
-                  SizedBox(height: 30), // Increased spacing
+                  SizedBox(height: 30),
                   TextField(
                     decoration: InputDecoration(
                       labelText: 'Enter Patient Email',
-                      labelStyle: commonTextStyle,
-                      border: commonBorder,
-                      focusedBorder: commonBorder.copyWith(
+                      labelStyle: TextStyle(
+                        color: Colors.blueGrey[900],
+                        fontSize: 20,
+                        fontWeight: FontWeight.w600,
+                        fontStyle: FontStyle.italic,
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide(color: Colors.black),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
                         borderSide: BorderSide(color: Colors.black),
                       ),
                       prefixIcon: Icon(Icons.email, color: Colors.black),
                     ),
                   ),
-                  SizedBox(height: 30), // Increased spacing
+                  SizedBox(height: 30),
                   TextField(
                     keyboardType: TextInputType.number,
                     decoration: InputDecoration(
                       labelText: 'Enter Contact Number',
-                      labelStyle: commonTextStyle,
-                      border: commonBorder,
-                      focusedBorder: commonBorder.copyWith(
+                      labelStyle: TextStyle(
+                        color: Colors.blueGrey[900],
+                        fontSize: 20,
+                        fontWeight: FontWeight.w600,
+                        fontStyle: FontStyle.italic,
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide(color: Colors.black),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
                         borderSide: BorderSide(color: Colors.black),
                       ),
                       prefixIcon: Icon(Icons.phone, color: Colors.black),
                     ),
                   ),
-                  SizedBox(height: 40), // Increased spacing
+                  SizedBox(height: 40),
                   Material(
                     color: Colors.transparent,
                     child: InkWell(
@@ -115,8 +135,8 @@ class _AddPatientPageState extends State<AddPatientPage> {
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
                             colors: [
-                              Color.fromARGB(255, 244, 167, 193), // Pastel Pink
-                              Color(0xFFF06292), // Slightly darker Pastel Pink
+                              Color.fromARGB(255, 244, 167, 193),
+                              Color(0xFFF06292),
                             ],
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
@@ -153,101 +173,69 @@ class _AddPatientPageState extends State<AddPatientPage> {
           ),
         ),
       ),
-      bottomNavigationBar: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              Color.fromARGB(255, 217, 242, 255),
-              Color.fromRGBO(132, 197, 238, 1),
-            ],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _selectedIndex,
+        onTap: _onItemTapped,
+        items: [
+          BottomNavigationBarItem(
+            icon: Image.asset(
+              'images/SmallLogo.png',
+              height: 50.0,
+              width: 50.0,
+            ),
+            label: 'Logo',
           ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.3),
-              spreadRadius: 5,
-              blurRadius: 10,
-              offset: Offset(0, 3), // changes position of shadow
+          BottomNavigationBarItem(
+            icon: Image.asset(
+              'images/prescriptionIcon.png',
+              height: 50.0,
+              width: 50.0,
             ),
-          ],
-        ),
-        child: BottomNavigationBar(
-          backgroundColor: Colors.transparent, // Make background transparent
-          elevation: 0, // Remove shadow/elevation
-          currentIndex: _selectedIndex,
-          onTap: _onItemTapped,
-          selectedItemColor:
-              Colors.black, // Set the selected item color to black
-          unselectedItemColor:
-              Colors.black, // Set the unselected item color to black
-          showSelectedLabels: true, // Show labels for selected items
-          showUnselectedLabels: true, // Show labels for unselected items
-          selectedLabelStyle: TextStyle(
-              color: Colors.black), // Set the label text color to black
-          unselectedLabelStyle: TextStyle(
-              color: Colors.black), // Set the label text color to black
-          items: [
-            BottomNavigationBarItem(
-              icon: Image.asset(
-                'images/SmallLogo.png', // Make sure to add this image to your assets
-                height: 50.0, // Adjusted size
-                width: 50.0, // Adjusted size
-              ),
-              label: 'Logo',
-            ),
-            BottomNavigationBarItem(
-              icon: Image.asset(
-                'images/prescriptionIcon.png', // Use the new prescription icon
-                height: 50.0, // Adjusted size
-                width: 50.0, // Adjusted size
-              ),
-              label: 'Prescription',
-            ),
-            BottomNavigationBarItem(
-              icon: Stack(
-                children: <Widget>[
-                  Icon(
-                    Icons.person,
-                    color: Colors.black,
-                    size: 40, // Adjusted size
+            label: 'Prescription',
+          ),
+          BottomNavigationBarItem(
+            icon: Stack(
+              children: <Widget>[
+                Icon(
+                  Icons.person,
+                  color: Colors.black,
+                  size: 40,
+                ),
+                Positioned(
+                  right: 0,
+                  bottom: 0,
+                  child: Icon(
+                    Icons.add_circle,
+                    color: Colors.blue,
+                    size: 24,
                   ),
-                  Positioned(
-                    right: 0,
-                    bottom: 0,
-                    child: Icon(
-                      Icons.add_circle,
-                      color: Colors.blue,
-                      size: 24, // Adjusted size
-                    ),
-                  ),
-                ],
-              ),
-              label: 'Add Patient',
+                ),
+              ],
             ),
-            BottomNavigationBarItem(
-              icon: Stack(
-                children: <Widget>[
-                  Icon(
-                    Icons.person,
-                    color: Colors.black,
-                    size: 40, // Adjusted size
+            label: 'Add Patient',
+          ),
+          BottomNavigationBarItem(
+            icon: Stack(
+              children: <Widget>[
+                Icon(
+                  Icons.person,
+                  color: Colors.black,
+                  size: 40,
+                ),
+                Positioned(
+                  right: 0,
+                  bottom: 0,
+                  child: Icon(
+                    Icons.edit,
+                    color: Colors.blue,
+                    size: 24,
                   ),
-                  Positioned(
-                    right: 0,
-                    bottom: 0,
-                    child: Icon(
-                      Icons.edit,
-                      color: Colors.blue,
-                      size: 24, // Adjusted size
-                    ),
-                  ),
-                ],
-              ),
-              label: 'Edit Profile',
+                ),
+              ],
             ),
-          ],
-        ),
+            label: 'Edit Profile',
+          ),
+        ],
       ),
     );
   }
