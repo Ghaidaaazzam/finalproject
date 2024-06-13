@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "533500950649",
+    "project_id": "pillpopin-dbe00",
+    "storage_bucket": "pillpopin-dbe00.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:533500950649:android:691ca502ab7543f758fca8",
+        "android_client_info": {
+          "package_name": "com.example.finalproject"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAHxuR9gKlVsQl44YWjbTnOhu5uvEKzTUU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -10,6 +10,7 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   cupertino_icons: ^1.0.2  # Add Cupertino icons dependency
+  firebase_core: ^3.1.0
   flutter_datetime_picker: ^1.5.1
   # Add other dependencies here
 
