@@ -36,6 +36,9 @@ class _LoginPageState extends State<LoginPage> {
   // Define the forgot password button color
   Color _forgotPasswordButtonColor = Color.fromARGB(255, 24, 0, 162)!;
 
+  // Define a variable to track the password visibility
+  bool _isPasswordVisible = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -50,11 +53,12 @@ class _LoginPageState extends State<LoginPage> {
               SizedBox(height: 20),
               TextField(
                 decoration: InputDecoration(
-                  labelText: 'Enter your Email',
+                  labelText: 'Enter your ID',
                   labelStyle: commonTextStyle,
                   border: commonBorder,
-                  prefixIcon: Icon(Icons.email, color: Colors.black),
+                  prefixIcon: Icon(Icons.person, color: Colors.black),
                 ),
+                keyboardType: TextInputType.number,
               ),
               SizedBox(height: 20),
               TextField(
@@ -63,15 +67,27 @@ class _LoginPageState extends State<LoginPage> {
                   labelStyle: commonTextStyle,
                   border: commonBorder,
                   prefixIcon: Icon(Icons.lock, color: Colors.black),
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _isPasswordVisible
+                          ? Icons.visibility
+                          : Icons.visibility_off,
+                      color: Colors.black,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _isPasswordVisible = !_isPasswordVisible;
+                      });
+                    },
+                  ),
                 ),
-                obscureText: true,
+                obscureText: !_isPasswordVisible,
               ),
               SizedBox(height: 10),
               Align(
                 alignment: Alignment.centerRight,
                 child: TextButton.icon(
-                  icon: Icon(Icons.vpn_key,
-                      color: _forgotPasswordButtonColor), // Added icon
+                  icon: Icon(Icons.vpn_key, color: _forgotPasswordButtonColor),
                   label: Text(
                     'Forgot Password?',
                     style: TextStyle(
@@ -101,8 +117,8 @@ class _LoginPageState extends State<LoginPage> {
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         colors: [
-                          Color.fromARGB(255, 244, 167, 193), // Pastel Pink
-                          Color(0xFFF06292), // Slightly darker Pastel Pink
+                          Color.fromARGB(255, 244, 167, 193),
+                          Color(0xFFF06292),
                         ],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
