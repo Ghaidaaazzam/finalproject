@@ -1,6 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:path_provider/path_provider.dart';
+import 'dart:io';
+import 'package:csv/csv.dart';
+import 'package:finalproject/firebase_options.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'dart:math';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(MyApp());
 }
 
@@ -19,9 +31,116 @@ class AddPatientPage extends StatefulWidget {
 }
 
 class _AddPatientPageState extends State<AddPatientPage> {
+  final TextEditingController _patientIdController = TextEditingController();
+  final TextEditingController _patientEmailController = TextEditingController();
+  final TextEditingController _contactNumberController =
+      TextEditingController();
+  final FocusNode _patientIdFocusNode = FocusNode();
+  final FocusNode _patientEmailFocusNode = FocusNode();
+  final FocusNode _contactNumberFocusNode = FocusNode();
+
+  bool _isPatientIdValid = true;
+  bool _showErrorMessage = false;
+  List<String> patientIds = [];
   int _selectedIndex = 2;
 
+  @override
+  void initState() {
+    super.initState();
+    loadPatientData();
+
+    _patientIdFocusNode.addListener(() {
+      if (!_patientIdFocusNode.hasFocus) {
+        _checkPatientId(_patientIdController.text);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _patientIdController.dispose();
+    _patientEmailController.dispose();
+    _contactNumberController.dispose();
+    _patientIdFocusNode.dispose();
+    _patientEmailFocusNode.dispose();
+    _contactNumberFocusNode.dispose();
+    super.dispose();
+  }
+
+  Future<void> loadPatientData() async {
+    try {
+      final ByteData data = await rootBundle.load('Excels/Users.csv');
+      final String csvData = String.fromCharCodes(data.buffer.asUint8List());
+      List<List<dynamic>> rowsAsListOfValues =
+          const CsvToListConverter().convert(csvData);
+
+      for (var row in rowsAsListOfValues) {
+        patientIds.add(
+            row[0].toString()); // Assuming Patient ID is in the first column
+      }
+    } catch (e) {
+      print("Error reading CSV file: $e");
+    }
+  }
+
+  void _checkPatientId(String id) {
+    setState(() {
+      _isPatientIdValid = patientIds.contains(id);
+    });
+  }
+
+  String generateRandomPassword(int length) {
+    const characters =
+        'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    final random = Random();
+    return String.fromCharCodes(Iterable.generate(length,
+        (_) => characters.codeUnitAt(random.nextInt(characters.length))));
+  }
+
+  void _addPatient() async {
+    setState(() {
+      _showErrorMessage = !_isPatientIdValid ||
+          _patientEmailController.text.isEmpty ||
+          _contactNumberController.text.isEmpty;
+    });
+
+    if (!_showErrorMessage) {
+      String randomPassword =
+          generateRandomPassword(10); // Generate a 10-character password
+
+      try {
+        await FirebaseFirestore.instance.collection('patients').add({
+          'ID': _patientIdController.text,
+          'Email': _patientEmailController.text,
+          'PhoneNumber': _contactNumberController.text,
+          'Password': randomPassword, // Add the generated password
+        });
+
+        // Clear the text fields after successful submission
+        _patientIdController.clear();
+        _patientEmailController.clear();
+        _contactNumberController.clear();
+
+        // Print success message to the console
+        print('Patient added successfully with password: $randomPassword');
+
+        // Show a success message using ScaffoldMessenger
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Patient added successfully!')),
+        );
+      } catch (e) {
+        print('Error adding patient: $e');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to add patient. Please try again.')),
+        );
+      }
+    }
+  }
+
   void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
     switch (index) {
       case 0:
         Navigator.pushNamed(context, '/');
@@ -31,6 +150,9 @@ class _AddPatientPageState extends State<AddPatientPage> {
         break;
       case 2:
         Navigator.pushNamed(context, '/addPatient');
+        break;
+      case 3:
+        Navigator.pushNamed(context, '/editProfile');
         break;
     }
   }
@@ -59,6 +181,8 @@ class _AddPatientPageState extends State<AddPatientPage> {
                   ),
                   SizedBox(height: 40),
                   TextField(
+                    controller: _patientIdController,
+                    focusNode: _patientIdFocusNode,
                     keyboardType: TextInputType.number,
                     decoration: InputDecoration(
                       labelText: 'Enter Patient ID',
@@ -78,10 +202,14 @@ class _AddPatientPageState extends State<AddPatientPage> {
                       ),
                       prefixIcon:
                           Icon(Icons.perm_identity, color: Colors.black),
+                      errorText:
+                          _isPatientIdValid ? null : 'Invalid Patient ID',
                     ),
                   ),
                   SizedBox(height: 30),
                   TextField(
+                    controller: _patientEmailController,
+                    focusNode: _patientEmailFocusNode,
                     decoration: InputDecoration(
                       labelText: 'Enter Patient Email',
                       labelStyle: TextStyle(
@@ -103,6 +231,8 @@ class _AddPatientPageState extends State<AddPatientPage> {
                   ),
                   SizedBox(height: 30),
                   TextField(
+                    controller: _contactNumberController,
+                    focusNode: _contactNumberFocusNode,
                     keyboardType: TextInputType.number,
                     decoration: InputDecoration(
                       labelText: 'Enter Contact Number',
@@ -127,9 +257,7 @@ class _AddPatientPageState extends State<AddPatientPage> {
                   Material(
                     color: Colors.transparent,
                     child: InkWell(
-                      onTap: () {
-                        // Handle add patient action
-                      },
+                      onTap: _addPatient,
                       borderRadius: BorderRadius.circular(30.0),
                       child: Ink(
                         decoration: BoxDecoration(
@@ -167,6 +295,14 @@ class _AddPatientPageState extends State<AddPatientPage> {
                       ),
                     ),
                   ),
+                  if (_showErrorMessage)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 16.0),
+                      child: Text(
+                        'Please correct the errors above before adding the patient.',
+                        style: TextStyle(color: Colors.red, fontSize: 16),
+                      ),
+                    ),
                 ],
               ),
             ),
