@@ -8,6 +8,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:math';
 import 'prescription.dart'; // Import the PrescriptionPage
+import 'doctorHomePage.dart'; // Import the DoctorHomePage
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -25,6 +26,9 @@ class MyApp extends StatelessWidget {
       routes: {
         '/': (context) => AddPatientPage(),
         '/prescription': (context) => PrescriptionPage(),
+        '/doctorHome': (context) => DoctorHomePage(),
+        '/addPatient': (context) => AddPatientPage(),
+        // '/editProfile': (context) => EditProfilePage(), // Assuming you have this page
       },
     );
   }
@@ -148,7 +152,8 @@ class _AddPatientPageState extends State<AddPatientPage> {
     });
     switch (index) {
       case 0:
-        Navigator.pushNamed(context, '/');
+        Navigator.pushNamed(
+            context, '/doctorHome'); // Navigate to DoctorHomePage
         break;
       case 1:
         Navigator.pushNamed(
