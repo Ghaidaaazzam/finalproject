@@ -1,4 +1,33 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:finalproject/firebase_options.dart';
+import 'prescription.dart'; // Import the PrescriptionPage
+import 'AddPatient.dart'; // Import the AddPatientPage
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  runApp(MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      initialRoute: '/',
+      routes: {
+        '/': (context) => DoctorHomePage(),
+        '/prescription': (context) => PrescriptionPage(),
+        '/doctorHome': (context) => DoctorHomePage(),
+        '/addPatient': (context) => AddPatientPage(),
+        '/editProfile': (context) =>
+            EditProfilePage(), // Assuming you have this page
+      },
+    );
+  }
+}
 
 class DoctorHomePage extends StatefulWidget {
   @override
@@ -14,10 +43,7 @@ class _DoctorHomePageState extends State<DoctorHomePage> {
     });
     switch (index) {
       case 0:
-        // No need to push again if already on this page
-        if (_selectedIndex != 0) {
-          Navigator.pushNamed(context, '/doctorHome');
-        }
+        Navigator.pushNamed(context, '/doctorHome');
         break;
       case 1:
         Navigator.pushNamed(context, '/prescription');
@@ -108,6 +134,20 @@ class _DoctorHomePageState extends State<DoctorHomePage> {
             label: 'Edit Profile',
           ),
         ],
+      ),
+    );
+  }
+}
+
+class EditProfilePage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: Text(
+          'Edit Profile Page',
+          style: TextStyle(fontSize: 24),
+        ),
       ),
     );
   }

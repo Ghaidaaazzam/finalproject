@@ -3,36 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
 import 'package:csv/csv.dart';
-import 'package:finalproject/firebase_options.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:math';
-import 'prescription.dart'; // Import the PrescriptionPage
-import 'doctorHomePage.dart'; // Import the DoctorHomePage
-
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
-  runApp(MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      initialRoute: '/',
-      routes: {
-        '/': (context) => AddPatientPage(),
-        '/prescription': (context) => PrescriptionPage(),
-        '/doctorHome': (context) => DoctorHomePage(),
-        '/addPatient': (context) => AddPatientPage(),
-        // '/editProfile': (context) => EditProfilePage(), // Assuming you have this page
-      },
-    );
-  }
-}
 
 class AddPatientPage extends StatefulWidget {
   @override
