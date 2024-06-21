@@ -7,6 +7,7 @@ import 'package:finalproject/firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:math';
+import 'prescription.dart'; // Import the PrescriptionPage
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -20,7 +21,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: AddPatientPage(),
+      initialRoute: '/',
+      routes: {
+        '/': (context) => AddPatientPage(),
+        '/prescription': (context) => PrescriptionPage(),
+      },
     );
   }
 }
@@ -146,7 +151,8 @@ class _AddPatientPageState extends State<AddPatientPage> {
         Navigator.pushNamed(context, '/');
         break;
       case 1:
-        Navigator.pushNamed(context, '/prescription');
+        Navigator.pushNamed(
+            context, '/prescription'); // Navigate to PrescriptionPage
         break;
       case 2:
         Navigator.pushNamed(context, '/addPatient');
