@@ -2,34 +2,42 @@ import 'package:flutter/material.dart';
 import 'FavoritePage.dart'; // Import the FavoritePage
 import 'EditProfilePage.dart'; // Import the EditProfilePage
 import 'ResetPassword.dart'; // Import the ResetPassword
+import 'MyMedicines.dart'; // Import MyMedicines page
 
-void main() {
-  runApp(MyApp());
-}
+class UserProfile extends StatefulWidget {
+  final String userId;
 
-class MyApp extends StatelessWidget {
+  UserProfile({required this.userId});
+
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'User Profile',
-      theme: ThemeData(
-        colorScheme: ColorScheme.light(
-          primary: Color(0xFFA8DADC), // Pastel Blue
-          secondary: Color(0xFFFF9DC6), // Pastel Pink
-          background: Color.fromARGB(255, 217, 242, 255), // White
-          surface: Color.fromARGB(255, 175, 227, 252), // Pastel Bright Blue
-          onPrimary: Color(0xFFFFFFFF), // White
-          onSecondary: Color.fromARGB(255, 0, 0, 0), // Black
-          onBackground: Color(0xFFB0BEC5), // Light Gray
-          onSurface: Color(0xFFB0BEC5), // Light Gray
-        ),
-      ),
-      home: UserProfile(),
-    );
-  }
+  _UserProfileState createState() => _UserProfileState();
 }
 
-class UserProfile extends StatelessWidget {
+class _UserProfileState extends State<UserProfile> {
+  int _selectedIndex = 1;
+
+  void _onItemTapped(int index) {
+    switch (index) {
+      case 1:
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => UserProfile(userId: widget.userId)),
+        );
+        break;
+      case 2:
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => MyMedicines(userId: widget.userId)),
+        );
+        break;
+      case 3:
+        // Do nothing for Statistics icon
+        break;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -151,6 +159,33 @@ class UserProfile extends StatelessWidget {
             ),
           ],
         ),
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        items: <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Image.asset('images/SmallLogo.png', width: 40, height: 40),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person, size: 30, color: Colors.black),
+            label: 'Profile',
+          ),
+          BottomNavigationBarItem(
+            icon: Image.asset('images/Medicines.png', width: 40, height: 40),
+            label: 'Medicines',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.bar_chart, size: 30, color: Colors.black),
+            label: 'Statistics',
+          ),
+        ],
+        currentIndex: _selectedIndex,
+        selectedItemColor: Colors.black,
+        unselectedItemColor: Colors.black,
+        onTap: _onItemTapped,
+        selectedLabelStyle: TextStyle(color: Colors.black),
+        unselectedLabelStyle: TextStyle(color: Colors.black),
+        showUnselectedLabels: true,
       ),
     );
   }

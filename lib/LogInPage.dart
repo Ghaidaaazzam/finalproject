@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:finalproject/firebase_options.dart';
-import 'forgetPassword.dart'; // Ensure this import is correct
+import 'forgetPassword.dart';
+import 'myMedicines.dart'; // Import the MyMedicines page
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,7 +19,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       home: LoginPage(),
       routes: {
-        '/forgetPassword': (context) => ForgotPassword(), // Add the route
+        '/forgetPassword': (context) => ForgotPassword(),
       },
     );
   }
@@ -73,6 +74,12 @@ class _LoginPageState extends State<LoginPage> {
       if (querySnapshot.docs.isNotEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Login successful!')),
+        );
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => MyMedicines(userId: enteredId),
+          ),
         );
       } else {
         setState(() {
@@ -169,8 +176,7 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                   onPressed: () {
-                    Navigator.pushNamed(context,
-                        '/forgetPassword'); // Navigate to ForgetPasswordPage
+                    Navigator.pushNamed(context, '/forgetPassword');
                   },
                   style: TextButton.styleFrom(
                     padding: EdgeInsets.zero,
