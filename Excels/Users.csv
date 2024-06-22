@@ -1,4 +1,4 @@
-﻿ID,FirstName,LastName,FatherName,MotherName,Birthday,PhoneNumber,PhoneNumber2
-123456789,Yomna,Zoabi,Adnan,Nujoud,08/06/2001,050555555,x
-987654321,Mohamad,Zoabi,Adnan,Nujoud,17/05/1997,056666666,x
-675930478,Sana,Zoabi,Adnan,Nujoud,29/01/2006,057849987,058899448
+﻿ID,FirstName,LastName,FatherName,MotherName,Birthday,PhoneNumber
+123456789,Yomna,Zoabi,Adnan,Nujoud,08/06/2001,050555555
+987654321,Mohamad,Zoabi,Adnan,Nujoud,17/05/1997,056666666
+675930478,Sana,Zoabi,Adnan,Nujoud,29/01/2006,057849987

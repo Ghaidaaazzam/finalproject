@@ -22,7 +22,7 @@ class _AddPatientPageState extends State<AddPatientPage> {
 
   bool _isPatientIdValid = true;
   bool _showErrorMessage = false;
-  List<String> patientIds = [];
+  List<List<dynamic>> patientData = [];
   int _selectedIndex = 2;
 
   @override
@@ -55,10 +55,7 @@ class _AddPatientPageState extends State<AddPatientPage> {
       List<List<dynamic>> rowsAsListOfValues =
           const CsvToListConverter().convert(csvData);
 
-      for (var row in rowsAsListOfValues) {
-        patientIds.add(
-            row[0].toString()); // Assuming Patient ID is in the first column
-      }
+      patientData = rowsAsListOfValues;
     } catch (e) {
       print("Error reading CSV file: $e");
     }
@@ -66,7 +63,9 @@ class _AddPatientPageState extends State<AddPatientPage> {
 
   void _checkPatientId(String id) {
     setState(() {
-      _isPatientIdValid = patientIds.contains(id);
+      _isPatientIdValid = patientData.any((row) =>
+          row[0].toString() ==
+          id); // Assuming Patient ID is in the first column
     });
   }
 
@@ -89,12 +88,22 @@ class _AddPatientPageState extends State<AddPatientPage> {
       String randomPassword =
           generateRandomPassword(10); // Generate a 10-character password
 
+      // Retrieve data from the CSV file based on Patient ID
+      var patientRow = patientData
+          .firstWhere((row) => row[0].toString() == _patientIdController.text);
+      String fullName =
+          "${patientRow[1]} ${patientRow[2]}"; // Assuming FirstName is in the second column and LastName in the third
+      String phoneNumberFromCsv =
+          patientRow[3]; // Assuming PhoneNumber is in the fourth column
+
       try {
         await FirebaseFirestore.instance.collection('patients').add({
+          'FullName': fullName,
           'ID': _patientIdController.text,
+          'Password': randomPassword,
           'Email': _patientEmailController.text,
-          'PhoneNumber': _contactNumberController.text,
-          'Password': randomPassword, // Add the generated password
+          'Phone Number': phoneNumberFromCsv,
+          'Phone Number2': _contactNumberController.text,
         });
 
         // Clear the text fields after successful submission
