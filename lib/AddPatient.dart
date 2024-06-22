@@ -94,7 +94,7 @@ class _AddPatientPageState extends State<AddPatientPage> {
       String fullName =
           "${patientRow[1]} ${patientRow[2]}"; // Assuming FirstName is in the second column and LastName in the third
       String phoneNumberFromCsv =
-          patientRow[3]; // Assuming PhoneNumber is in the fourth column
+          patientRow[6]; // Assuming PhoneNumber is in the seventh column
 
       try {
         await FirebaseFirestore.instance.collection('patients').add({
