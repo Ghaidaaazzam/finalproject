@@ -16,10 +16,12 @@ class _AddPatientPageState extends State<AddPatientPage> {
   final TextEditingController _patientEmailController = TextEditingController();
   final TextEditingController _contactNumberController =
       TextEditingController();
+  final TextEditingController _contactNumberController2 =
+      TextEditingController();
   final FocusNode _patientIdFocusNode = FocusNode();
   final FocusNode _patientEmailFocusNode = FocusNode();
   final FocusNode _contactNumberFocusNode = FocusNode();
-
+  final FocusNode _contactNumberFocusNode2 = FocusNode();
   bool _isPatientIdValid = true;
   bool _showErrorMessage = false;
   List<List<dynamic>> patientData = [];
@@ -42,6 +44,7 @@ class _AddPatientPageState extends State<AddPatientPage> {
     _patientIdController.dispose();
     _patientEmailController.dispose();
     _contactNumberController.dispose();
+    _contactNumberController2.dispose();
     _patientIdFocusNode.dispose();
     _patientEmailFocusNode.dispose();
     _contactNumberFocusNode.dispose();
@@ -81,7 +84,8 @@ class _AddPatientPageState extends State<AddPatientPage> {
     setState(() {
       _showErrorMessage = !_isPatientIdValid ||
           _patientEmailController.text.isEmpty ||
-          _contactNumberController.text.isEmpty;
+          _contactNumberController.text.isEmpty ||
+          _contactNumberController2.text.isEmpty;
     });
 
     if (!_showErrorMessage) {
@@ -93,8 +97,10 @@ class _AddPatientPageState extends State<AddPatientPage> {
           .firstWhere((row) => row[0].toString() == _patientIdController.text);
       String fullName =
           "${patientRow[1]} ${patientRow[2]}"; // Assuming FirstName is in the second column and LastName in the third
-      String phoneNumberFromCsv =
-          patientRow[6]; // Assuming PhoneNumber is in the seventh column
+      // String phoneNumberFromCsv =
+      //     patientRow[3]; // Assuming PhoneNumber is in the seventh column
+      String birthdate =
+          patientRow[4]; // Assuming Birthdate is in the fifth column
 
       try {
         await FirebaseFirestore.instance.collection('patients').add({
@@ -102,14 +108,16 @@ class _AddPatientPageState extends State<AddPatientPage> {
           'ID': _patientIdController.text,
           'Password': randomPassword,
           'Email': _patientEmailController.text,
-          'Phone Number': phoneNumberFromCsv,
-          'Phone Number2': _contactNumberController.text,
+          'Phone Number': _contactNumberController.text,
+          'Phone Number2': _contactNumberController2.text,
+          'Birthdate': birthdate,
         });
 
         // Clear the text fields after successful submission
         _patientIdController.clear();
         _patientEmailController.clear();
         _contactNumberController.clear();
+        _contactNumberController2.clear();
 
         // Print success message to the console
         print('Patient added successfully with password: $randomPassword');
@@ -228,6 +236,30 @@ class _AddPatientPageState extends State<AddPatientPage> {
                     keyboardType: TextInputType.number,
                     decoration: InputDecoration(
                       labelText: 'Enter Contact Number',
+                      labelStyle: TextStyle(
+                        color: Colors.blueGrey[900],
+                        fontSize: 20,
+                        fontWeight: FontWeight.w600,
+                        fontStyle: FontStyle.italic,
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide(color: Colors.black),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide(color: Colors.black),
+                      ),
+                      prefixIcon: Icon(Icons.phone, color: Colors.black),
+                    ),
+                  ),
+                  SizedBox(height: 30),
+                  TextField(
+                    controller: _contactNumberController2,
+                    focusNode: _contactNumberFocusNode2,
+                    keyboardType: TextInputType.number,
+                    decoration: InputDecoration(
+                      labelText: 'Enter Contact Number 2',
                       labelStyle: TextStyle(
                         color: Colors.blueGrey[900],
                         fontSize: 20,
