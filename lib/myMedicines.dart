@@ -22,7 +22,6 @@ class MyApp extends StatelessWidget {
       ],
       locale: const Locale(
           'en', 'GB'), // Set the locale to UK English for 24-hour format
-      title: 'My Medicines',
       theme: ThemeData(
         colorScheme: ColorScheme.light(
           primary: Color(0xFFA8DADC), // Pastel Blue
@@ -139,7 +138,10 @@ class _MyMedicinesState extends State<MyMedicines> {
               ),
             ),
           ),
-          child: child!,
+          child: MediaQuery(
+            data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
+            child: child!,
+          ),
         );
       },
     );
@@ -258,7 +260,7 @@ class _MyMedicinesState extends State<MyMedicines> {
                             },
                           ),
                           Align(
-                            alignment: Alignment.centerRight,
+                            alignment: Alignment.center,
                             child: Material(
                               color: Colors.transparent,
                               child: InkWell(
@@ -289,14 +291,18 @@ class _MyMedicinesState extends State<MyMedicines> {
                                     ],
                                   ),
                                   padding: EdgeInsets.symmetric(
-                                      horizontal: 12, vertical: 8),
-                                  child: Center(
-                                    child: Text(
-                                      'Add Time',
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        color: Colors.black,
-                                        fontWeight: FontWeight.bold,
+                                      horizontal: 8,
+                                      vertical: 8), // Adjusted padding
+                                  child: Container(
+                                    width: 100, // Adjusted width
+                                    child: Center(
+                                      child: Text(
+                                        'Add Time',
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          color: Colors.black,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                       ),
                                     ),
                                   ),
