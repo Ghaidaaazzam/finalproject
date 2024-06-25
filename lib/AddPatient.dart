@@ -101,7 +101,7 @@ class _AddPatientPageState extends State<AddPatientPage> {
       //     patientRow[3]; // Assuming PhoneNumber is in the seventh column
       String birthdate =
           patientRow[4]; // Assuming Birthdate is in the fifth column
-
+      String gender = patientRow[7];
       try {
         await FirebaseFirestore.instance.collection('patients').add({
           'FullName': fullName,
@@ -111,6 +111,7 @@ class _AddPatientPageState extends State<AddPatientPage> {
           'Phone Number': _contactNumberController.text,
           'Phone Number2': _contactNumberController2.text,
           'Birthdate': birthdate,
+          'Gender': gender,
         });
 
         // Clear the text fields after successful submission
