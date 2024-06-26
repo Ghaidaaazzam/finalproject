@@ -38,6 +38,14 @@ class EditProfilePage extends StatefulWidget {
 
 class _EditProfilePageState extends State<EditProfilePage> {
   late Future<DocumentSnapshot> userDoc;
+  final TextEditingController _fullNameController = TextEditingController();
+  final TextEditingController _phoneNumberController = TextEditingController();
+  final TextEditingController _emergencyContactController =
+      TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _dobController = TextEditingController();
+  late Map<String, dynamic> initialData;
+  String? docId; // Variable to hold the document ID
 
   @override
   void initState() {
@@ -52,11 +60,57 @@ class _EditProfilePageState extends State<EditProfilePage> {
         .get()
         .then((QuerySnapshot querySnapshot) {
       if (querySnapshot.docs.isNotEmpty) {
-        return querySnapshot.docs.first;
+        var doc = querySnapshot.docs.first;
+        docId = doc.id; // Get the document ID
+        initialData = doc.data() as Map<String, dynamic>;
+        _fullNameController.text = initialData['FullName'];
+        _phoneNumberController.text = initialData['Phone Number'];
+        _emergencyContactController.text = initialData['Phone Number2'];
+        _emailController.text = initialData['Email'];
+        _dobController.text = initialData['Birthdate'];
+        return doc;
       } else {
         throw Exception('User not found');
       }
     });
+  }
+
+  void _showSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          message,
+          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+        ),
+      ),
+    );
+  }
+
+  void _updateProfile() async {
+    if (_fullNameController.text == initialData['FullName'] &&
+        _phoneNumberController.text == initialData['Phone Number'] &&
+        _emergencyContactController.text == initialData['Phone Number2'] &&
+        _emailController.text == initialData['Email'] &&
+        _dobController.text == initialData['Birthdate']) {
+      _showSnackBar('No changes detected.');
+      return;
+    }
+
+    try {
+      await FirebaseFirestore.instance
+          .collection('patients')
+          .doc(docId) // Use the document ID to update
+          .update({
+        'FullName': _fullNameController.text,
+        'Phone Number': _phoneNumberController.text,
+        'Phone Number2': _emergencyContactController.text,
+        'Email': _emailController.text,
+        'Birthdate': _dobController.text,
+      });
+      _showSnackBar('Profile updated successfully!');
+    } catch (e) {
+      _showSnackBar('Error updating profile: $e');
+    }
   }
 
   @override
@@ -117,12 +171,12 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   ),
                 ),
                 SizedBox(height: 10),
-                buildTextField('Full Name', userData['FullName']),
-                buildTextField('Phone Number', userData['Phone Number']),
+                buildTextField('Full Name', _fullNameController),
+                buildTextField('Phone Number', _phoneNumberController),
                 buildTextField(
-                    'Emergency Contact Number', userData['Phone Number2']),
-                buildTextField('Email', userData['Email']),
-                buildTextField('Date Of Birth', userData['Birthdate']),
+                    'Emergency Contact Number', _emergencyContactController),
+                buildTextField('Email', _emailController),
+                buildTextField('Date Of Birth', _dobController),
                 SizedBox(height: 30),
                 Ink(
                   decoration: BoxDecoration(
@@ -146,9 +200,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     ],
                   ),
                   child: InkWell(
-                    onTap: () {
-                      // Handle update profile button press
-                    },
+                    onTap: _updateProfile,
                     borderRadius: BorderRadius.circular(30.0),
                     child: Container(
                       padding:
@@ -173,10 +225,11 @@ class _EditProfilePageState extends State<EditProfilePage> {
     );
   }
 
-  Widget buildTextField(String labelText, String placeholder) {
+  Widget buildTextField(String labelText, TextEditingController controller) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 20.0),
       child: TextField(
+        controller: controller,
         decoration: InputDecoration(
           contentPadding: EdgeInsets.only(bottom: 5),
           labelText: labelText,
@@ -186,12 +239,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
             color: Colors.black,
           ),
           floatingLabelBehavior: FloatingLabelBehavior.always,
-          hintText: placeholder,
-          hintStyle: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            color: Colors.grey,
-          ),
           filled: true,
           fillColor: Colors.white.withOpacity(0.5),
           border: OutlineInputBorder(
