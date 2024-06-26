@@ -110,7 +110,7 @@ class _MyMedicinesState extends State<MyMedicines> {
       DocumentReference prescriptionDoc, List<dynamic> times,
       [int? index]) async {
     TimeOfDay initialTime = TimeOfDay.now();
-    if (index != null) {
+    if (index != null && index < times.length) {
       final timeParts = times[index].split(':');
       initialTime = TimeOfDay(
           hour: int.parse(timeParts[0]), minute: int.parse(timeParts[1]));
@@ -149,7 +149,7 @@ class _MyMedicinesState extends State<MyMedicines> {
       setState(() {
         final timeString =
             "${picked.hour.toString().padLeft(2, '0')}:${picked.minute.toString().padLeft(2, '0')}";
-        if (index == null) {
+        if (index == null || index >= times.length) {
           times.add(timeString);
         } else {
           times[index] = timeString;
@@ -215,8 +215,16 @@ class _MyMedicinesState extends State<MyMedicines> {
                 children: prescriptionsSnapshot.data!.docs.map((document) {
                   Map<String, dynamic> prescription =
                       document.data() as Map<String, dynamic>;
+                  int dailyDose = int.tryParse(prescription['dailyDose']) ?? 0;
+
+                  // Ensure 'times' field is initialized
+                  List<dynamic> times = prescription['times'] ?? [];
+                  if (times.isEmpty) {
+                    document.reference.update({'times': []});
+                  }
 
                   return Card(
+                    color: Colors.white, // Setting the card color to white
                     margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     child: Padding(
                       padding: const EdgeInsets.all(16.0),
@@ -228,87 +236,64 @@ class _MyMedicinesState extends State<MyMedicines> {
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
+                              color:
+                                  Colors.black, // Setting text color to black
                             ),
                           ),
                           SizedBox(height: 8),
-                          Text('Daily Dose: ${prescription['dailyDose']}'),
                           Text(
-                              'Pills per Dose: ${prescription['pillsPerDose']}'),
-                          Text('Start Date: ${prescription['startDate']}'),
-                          Text('End Date: ${prescription['endDate']}'),
+                            'Daily Dose: ${prescription['dailyDose']}',
+                            style: TextStyle(color: Colors.black), // Text color
+                          ),
+                          Text(
+                            'Pills per Dose: ${prescription['pillsPerDose']}',
+                            style: TextStyle(color: Colors.black), // Text color
+                          ),
+                          Text(
+                            'Start Date: ${prescription['startDate']}',
+                            style: TextStyle(color: Colors.black), // Text color
+                          ),
+                          Text(
+                            'End Date: ${prescription['endDate']}',
+                            style: TextStyle(color: Colors.black), // Text color
+                          ),
                           if (prescription['doctorNotice'] != null &&
                               prescription['doctorNotice'].isNotEmpty)
                             Text(
-                                'Doctor\'s Notice: ${prescription['doctorNotice']}'),
+                              'Doctor\'s Notice: ${prescription['doctorNotice']}',
+                              style:
+                                  TextStyle(color: Colors.black), // Text color
+                            ),
                           SizedBox(height: 8),
-                          Text('Times:'),
+                          Text(
+                            'Times:',
+                            style: TextStyle(color: Colors.black), // Text color
+                          ),
                           ListView.builder(
                             shrinkWrap: true,
-                            itemCount: prescription['times']?.length ?? 0,
+                            itemCount: dailyDose,
                             itemBuilder: (context, index) {
                               return ListTile(
-                                title: Text(prescription['times'][index]),
+                                title: Text(
+                                  times.length > index
+                                      ? times[index]
+                                      : 'Set Time',
+                                  style: TextStyle(
+                                      color: Colors.black), // Text color
+                                ),
                                 trailing: IconButton(
-                                  icon: Icon(Icons.edit),
+                                  icon: Icon(Icons.edit,
+                                      color: Colors
+                                          .black), // Set icon color to black
                                   onPressed: () => _selectTime(
-                                      context,
-                                      document.reference,
-                                      List.from(prescription['times']),
-                                      index),
+                                    context,
+                                    document.reference,
+                                    times,
+                                    index,
+                                  ),
                                 ),
                               );
                             },
-                          ),
-                          Align(
-                            alignment: Alignment.center,
-                            child: Material(
-                              color: Colors.transparent,
-                              child: InkWell(
-                                onTap: () => _selectTime(
-                                    context,
-                                    document.reference,
-                                    List.from(prescription['times'] ?? [])),
-                                borderRadius: BorderRadius.circular(30.0),
-                                child: Ink(
-                                  decoration: BoxDecoration(
-                                    gradient: LinearGradient(
-                                      colors: [
-                                        Color.fromARGB(255, 244, 167, 193),
-                                        Color(0xFFF06292),
-                                      ],
-                                      begin: Alignment.topLeft,
-                                      end: Alignment.bottomRight,
-                                      stops: [0.1, 1.0],
-                                    ),
-                                    borderRadius: BorderRadius.circular(30.0),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black26,
-                                        offset: Offset(0, 4),
-                                        blurRadius: 4.0,
-                                        spreadRadius: 1.0,
-                                      ),
-                                    ],
-                                  ),
-                                  padding: EdgeInsets.symmetric(
-                                      horizontal: 8,
-                                      vertical: 8), // Adjusted padding
-                                  child: Container(
-                                    width: 100, // Adjusted width
-                                    child: Center(
-                                      child: Text(
-                                        'Add Time',
-                                        style: TextStyle(
-                                          fontSize: 14,
-                                          color: Colors.black,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
                           ),
                         ],
                       ),
