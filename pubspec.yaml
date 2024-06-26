@@ -16,6 +16,8 @@ dependencies:
   firebase_core: ^3.1.0
   cloud_firestore: ^5.0.1
   flutter_datetime_picker: ^1.5.1
+  flutter_local_notifications: ^10.0.0
+  timezone: ^0.8.0
   # Add other dependencies here
 
 dev_dependencies:

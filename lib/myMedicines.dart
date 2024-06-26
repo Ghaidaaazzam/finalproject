@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'UserProfile.dart'; // Import UserProfile
 import 'EditProfilePage.dart'; // Import EditProfilePage
+import 'notification_helper.dart'; // Import NotificationHelper
+import 'package:timezone/data/latest.dart' as tz;
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  tz.initializeTimeZones();
   runApp(MyApp());
 }
 
@@ -15,6 +20,7 @@ class MyApp extends StatelessWidget {
       localizationsDelegates: [
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
       ],
       supportedLocales: [
         const Locale('en', 'US'), // English (US)
@@ -81,6 +87,7 @@ class MyMedicines extends StatefulWidget {
 
 class _MyMedicinesState extends State<MyMedicines> {
   int _selectedIndex = 2;
+  late NotificationHelper _notificationHelper;
 
   void _onItemTapped(int index) {
     switch (index) {
@@ -104,6 +111,15 @@ class _MyMedicinesState extends State<MyMedicines> {
   void initState() {
     super.initState();
     print('User ID: ${widget.userId}');
+    _notificationHelper = NotificationHelper();
+    _requestPermissions();
+  }
+
+  void _requestPermissions() {
+    _notificationHelper.flutterLocalNotificationsPlugin
+        .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>()
+        ?.requestPermission();
   }
 
   Future<void> _selectTime(BuildContext context,
@@ -156,6 +172,12 @@ class _MyMedicinesState extends State<MyMedicines> {
         }
         prescriptionDoc.update({'times': times});
       });
+
+      print('Scheduling notification for $picked');
+      await _notificationHelper.scheduleNotification(
+        picked,
+        'Time to take your medicine!',
+      );
     }
   }
 
