@@ -84,31 +84,31 @@ class _QuestionScreenState extends State<QuestionScreen> {
       TimeQuestionScreen(
         question: 'What time do you wake up in the morning?',
         pageController: _pageController,
-        icon: Icons.wb_sunny, // Icon for waking up
+        imagePath: 'images/sun.png', // Image for waking up
         isLast: false,
       ),
       TimeQuestionScreen(
         question: 'At what time do you have breakfast?',
         pageController: _pageController,
-        icon: Icons.free_breakfast, // Icon for breakfast
+        imagePath: 'images/coffee.png', // Image for breakfast
         isLast: false,
       ),
       TimeQuestionScreen(
         question: 'What time do you have lunch?',
         pageController: _pageController,
-        icon: Icons.lunch_dining, // Icon for lunch
+        imagePath: 'images/launch.png', // Image for lunch
         isLast: false,
       ),
       TimeQuestionScreen(
         question: 'What time do you have dinner?',
         pageController: _pageController,
-        icon: Icons.dinner_dining, // Icon for dinner
+        imagePath: 'images/dinner.png', // Image for dinner
         isLast: false,
       ),
       TimeQuestionScreen(
         question: 'What time do you go to bed at night?',
         pageController: _pageController,
-        icon: Icons.bedtime, // Icon for going to bed
+        imagePath: 'images/moon.png', // Image for going to bed
         isLast: true,
       ),
     ]);
@@ -135,13 +135,13 @@ class _QuestionScreenState extends State<QuestionScreen> {
 class TimeQuestionScreen extends StatefulWidget {
   final String question;
   final PageController pageController;
-  final IconData icon;
+  final String imagePath; // Change to use image path
   final bool isLast;
 
   TimeQuestionScreen({
     required this.question,
     required this.pageController,
-    required this.icon,
+    required this.imagePath, // Change to use image path
     required this.isLast,
   });
 
@@ -204,10 +204,11 @@ class _TimeQuestionScreenState extends State<TimeQuestionScreen> {
             SizedBox(height: 40.0),
             Container(
               alignment: Alignment.topCenter,
-              child: Icon(
-                widget.icon,
-                size: 80.0, // Adjust the size of the icon
-                color: Colors.black, // Color of the icon
+              child: Image.asset(
+                widget.imagePath, // Use image asset
+                width: 80.0, // Adjust the size of the image
+                height: 80.0, // Adjust the size of the image
+                fit: BoxFit.contain,
               ),
             ),
             SizedBox(height: 40.0),
