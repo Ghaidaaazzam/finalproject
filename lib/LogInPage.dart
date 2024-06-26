@@ -19,7 +19,8 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       home: LoginPage(),
       routes: {
-        '/forgetPassword': (context) => ForgotPassword(),
+        '/forgetPassword': (context) =>
+            ForgotPassword(userId: ''), // Add userId here
       },
     );
   }
@@ -176,7 +177,13 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                   onPressed: () {
-                    Navigator.pushNamed(context, '/forgetPassword');
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ForgotPassword(
+                            userId: _idController.text), // Add userId here
+                      ),
+                    );
                   },
                   style: TextButton.styleFrom(
                     padding: EdgeInsets.zero,

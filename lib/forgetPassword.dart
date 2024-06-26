@@ -9,12 +9,16 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: ForgotPassword(),
+      home: ForgotPassword(userId: 'exampleUserId'), // Add userId here
     );
   }
 }
 
 class ForgotPassword extends StatelessWidget {
+  final String userId; // Add this line
+
+  ForgotPassword({required this.userId}); // Add this line
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -96,8 +100,10 @@ class ForgotPassword extends StatelessWidget {
                                         Navigator.push(
                                           context,
                                           MaterialPageRoute(
-                                              builder: (context) =>
-                                                  ResetPassword()),
+                                            builder: (context) => ResetPassword(
+                                                userId:
+                                                    userId), // Add userId here
+                                          ),
                                         );
                                       },
                                     ),

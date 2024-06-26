@@ -225,7 +225,8 @@ class _UserProfileState extends State<UserProfile> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => ResetPassword(),
+                    builder: (context) =>
+                        ResetPassword(userId: widget.userId), // Add userId here
                   ),
                 );
               },
