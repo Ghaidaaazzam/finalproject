@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'FavoritePage.dart'; // Import the FavoritePage
 import 'EditProfilePage.dart'; // Import the EditProfilePage
 import 'ResetPassword.dart'; // Import the ResetPassword
@@ -15,6 +16,40 @@ class UserProfile extends StatefulWidget {
 
 class _UserProfileState extends State<UserProfile> {
   int _selectedIndex = 1;
+  String _userName = 'Loading...';
+  String _gender = 'Unknown';
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUserName();
+  }
+
+  void _fetchUserName() async {
+    try {
+      // Find the document by the field 'ID'
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('patients')
+          .where('ID', isEqualTo: widget.userId)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        DocumentSnapshot userDoc = querySnapshot.docs.first;
+        setState(() {
+          _userName = userDoc['FullName'];
+          _gender = userDoc['Gender'];
+        });
+      } else {
+        setState(() {
+          _userName = 'User not found';
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _userName = 'Error fetching user';
+      });
+    }
+  }
 
   void _onItemTapped(int index) {
     switch (index) {
@@ -60,23 +95,19 @@ class _UserProfileState extends State<UserProfile> {
             SizedBox(height: 20),
             CircleAvatar(
               radius: 50,
-              // backgroundImage: AssetImage('assets/images/your_photo.png'),
-              child: Align(
-                alignment: Alignment.bottomRight,
-                child: CircleAvatar(
-                  backgroundColor: Colors.white,
-                  radius: 15,
-                  child: Icon(
-                    Icons.edit,
-                    size: 20,
-                    color: Colors.black, // Change to black
-                  ),
+              backgroundColor: Colors.white,
+              child: ClipOval(
+                child: Image.asset(
+                  _gender == 'M' ? 'images/male.png' : 'images/female.png',
+                  fit: BoxFit.cover,
+                  width: 100,
+                  height: 100,
                 ),
               ),
             ),
             SizedBox(height: 10),
             Text(
-              'John Doe',
+              _userName,
               style: TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
