@@ -4,6 +4,7 @@ import 'FavoritePage.dart'; // Import the FavoritePage
 import 'EditProfilePage.dart'; // Import the EditProfilePage
 import 'ResetPassword.dart'; // Import the ResetPassword
 import 'MyMedicines.dart'; // Import MyMedicines page
+import 'LoginPage.dart'; // Import the LoginPage
 
 class UserProfile extends StatefulWidget {
   final String userId;
@@ -71,6 +72,56 @@ class _UserProfileState extends State<UserProfile> {
         // Do nothing for Statistics icon
         break;
     }
+  }
+
+  void _showLogoutDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Color.fromARGB(255, 217, 242, 255),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15),
+          ),
+          title: Text(
+            "Logout",
+            style: TextStyle(
+              color: Colors.black,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          content: Text(
+            "Are you sure you want to logout?",
+            style: TextStyle(color: Colors.black),
+          ),
+          actions: [
+            TextButton(
+              child: Text(
+                "No",
+                style: TextStyle(color: Color(0xFF007BFF)),
+              ),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text(
+                "Yes",
+                style: TextStyle(color: Color(0xFF007BFF)),
+              ),
+              onPressed: () {
+                Navigator.of(context).pop();
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (context) => LoginPage()),
+                  (Route<dynamic> route) => false,
+                );
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -187,7 +238,9 @@ class _UserProfileState extends State<UserProfile> {
             ProfileMenuItem(
               icon: Icons.logout,
               text: 'Logout',
-              press: () {},
+              press: () {
+                _showLogoutDialog();
+              },
             ),
           ],
         ),
