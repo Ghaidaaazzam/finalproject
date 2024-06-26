@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 void main() {
   runApp(MyApp());
@@ -21,12 +22,43 @@ class MyApp extends StatelessWidget {
           onSurface: Color(0xFFB0BEC5), // Light Gray
         ),
       ),
-      home: EditProfilePage(),
+      home: EditProfilePage(userId: 'ZExnO5oRMBJfQuR2VOoX'), // example userId
     );
   }
 }
 
-class EditProfilePage extends StatelessWidget {
+class EditProfilePage extends StatefulWidget {
+  final String userId;
+
+  EditProfilePage({required this.userId});
+
+  @override
+  _EditProfilePageState createState() => _EditProfilePageState();
+}
+
+class _EditProfilePageState extends State<EditProfilePage> {
+  late Future<DocumentSnapshot> userDoc;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUserDoc();
+  }
+
+  void _fetchUserDoc() {
+    userDoc = FirebaseFirestore.instance
+        .collection('patients')
+        .where('ID', isEqualTo: widget.userId)
+        .get()
+        .then((QuerySnapshot querySnapshot) {
+      if (querySnapshot.docs.isNotEmpty) {
+        return querySnapshot.docs.first;
+      } else {
+        throw Exception('User not found');
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -51,75 +83,92 @@ class EditProfilePage extends StatelessWidget {
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            SizedBox(height: 20),
-            CircleAvatar(
-              radius: 50,
-              backgroundImage: AssetImage('assets/images/your_photo.png'),
-              child: Align(
-                alignment: Alignment.bottomRight,
-                child: CircleAvatar(
+      body: FutureBuilder<DocumentSnapshot>(
+        future: userDoc,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          }
+          if (snapshot.hasError) {
+            return Center(child: Text('Error loading user data'));
+          }
+          if (!snapshot.hasData || !snapshot.data!.exists) {
+            return Center(child: Text('User not found'));
+          }
+
+          var userData = snapshot.data!.data() as Map<String, dynamic>;
+          var gender = userData['Gender'];
+
+          return SingleChildScrollView(
+            padding: EdgeInsets.all(16.0),
+            child: Column(
+              children: [
+                SizedBox(height: 20),
+                CircleAvatar(
+                  radius: 50,
                   backgroundColor: Colors.white,
-                  radius: 15,
-                  child: Icon(
-                    Icons.edit,
-                    size: 20,
-                    color: Colors.black, // Changed to black
-                  ),
-                ),
-              ),
-            ),
-            SizedBox(height: 10),
-            buildTextField('Full Name', 'John Doe'),
-            buildTextField('Phone Number', '+123 567 89000'),
-            buildTextField('Email', 'johndoe@example.com'),
-            buildTextField('Date Of Birth', 'DD / MM / YYYY'),
-            SizedBox(height: 30),
-            Ink(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    Color.fromARGB(255, 244, 167, 193), // Pastel Pink
-                    Color(0xFFF06292), // Slightly darker Pastel Pink
-                  ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  stops: [0.1, 1.0],
-                ),
-                borderRadius: BorderRadius.circular(30.0),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black26,
-                    offset: Offset(0, 4),
-                    blurRadius: 4.0,
-                    spreadRadius: 1.0,
-                  ),
-                ],
-              ),
-              child: InkWell(
-                onTap: () {
-                  // Handle update profile button press
-                },
-                borderRadius: BorderRadius.circular(30.0),
-                child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
-                  child: Text(
-                    'Update Profile',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
+                  child: ClipOval(
+                    child: Image.asset(
+                      gender == 'M' ? 'images/male.png' : 'images/female.png',
+                      fit: BoxFit.cover,
+                      width: 90,
+                      height: 90,
                     ),
-                    textAlign: TextAlign.center,
                   ),
                 ),
-              ),
+                SizedBox(height: 10),
+                buildTextField('Full Name', userData['FullName']),
+                buildTextField('Phone Number', userData['Phone Number']),
+                buildTextField(
+                    'Emergency Contact Number', userData['Phone Number2']),
+                buildTextField('Email', userData['Email']),
+                buildTextField('Date Of Birth', userData['Birthdate']),
+                SizedBox(height: 30),
+                Ink(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        Color.fromARGB(255, 244, 167, 193), // Pastel Pink
+                        Color(0xFFF06292), // Slightly darker Pastel Pink
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      stops: [0.1, 1.0],
+                    ),
+                    borderRadius: BorderRadius.circular(30.0),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black26,
+                        offset: Offset(0, 4),
+                        blurRadius: 4.0,
+                        spreadRadius: 1.0,
+                      ),
+                    ],
+                  ),
+                  child: InkWell(
+                    onTap: () {
+                      // Handle update profile button press
+                    },
+                    borderRadius: BorderRadius.circular(30.0),
+                    child: Container(
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                      child: Text(
+                        'Update Profile',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }

@@ -100,8 +100,8 @@ class _UserProfileState extends State<UserProfile> {
                 child: Image.asset(
                   _gender == 'M' ? 'images/male.png' : 'images/female.png',
                   fit: BoxFit.cover,
-                  width: 100,
-                  height: 100,
+                  width: 90,
+                  height: 90,
                 ),
               ),
             ),
@@ -122,7 +122,8 @@ class _UserProfileState extends State<UserProfile> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => EditProfilePage(),
+                    builder: (context) =>
+                        EditProfilePage(userId: widget.userId),
                   ),
                 );
               },
