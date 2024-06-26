@@ -1,20 +1,13 @@
 import 'package:flutter/material.dart';
-import 'forgetPassword.dart'; // Import the second code file
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-void main() {
-  runApp(MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: ResetPassword(),
-    );
-  }
-}
+import 'LogInPage.dart';
 
 class ResetPassword extends StatefulWidget {
+  final String userId; // Add this line
+
+  ResetPassword({required this.userId}); // Add this line
+
   @override
   _ResetPasswordState createState() => _ResetPasswordState();
 }
@@ -39,10 +32,28 @@ class _ResetPasswordState extends State<ResetPassword> {
         _errorMessage = 'Passwords do not match';
         _isConfirmPasswordError = true;
       } else {
-        _errorMessage = '';
-        _isNewPasswordError = false;
-        _isConfirmPasswordError = false;
-        // Show success dialog
+        _updatePasswordInFirebase();
+      }
+    });
+  }
+
+  void _updatePasswordInFirebase() async {
+    try {
+      // Find the document by the field 'ID'
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('patients')
+          .where('ID', isEqualTo: widget.userId)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        DocumentSnapshot userDoc = querySnapshot.docs.first;
+        await FirebaseFirestore.instance
+            .collection('patients')
+            .doc(userDoc.id)
+            .update({
+          'Password': _newPasswordController.text,
+        });
+
         showDialog(
           context: context,
           builder: (BuildContext context) {
@@ -80,7 +91,8 @@ class _ResetPasswordState extends State<ResetPassword> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => ForgotPassword()),
+                              builder: (context) =>
+                                  LoginPage()), // Change this to navigate to the login page
                         );
                       },
                     ),
@@ -90,8 +102,16 @@ class _ResetPasswordState extends State<ResetPassword> {
             );
           },
         );
+      } else {
+        setState(() {
+          _errorMessage = 'User not found';
+        });
       }
-    });
+    } catch (e) {
+      setState(() {
+        _errorMessage = 'Error updating password: $e';
+      });
+    }
   }
 
   @override
@@ -99,7 +119,7 @@ class _ResetPasswordState extends State<ResetPassword> {
     return Scaffold(
       backgroundColor: Color.fromARGB(255, 217, 242, 255),
       body: Center(
-        child: Padding(
+        child: SingleChildScrollView(
           padding: const EdgeInsets.all(20.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
