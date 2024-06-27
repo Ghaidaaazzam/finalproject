@@ -1,11 +1,11 @@
-﻿Medicine Name,Medicine Form,Dose,Image
-xxx,Pill (Tablet),500 mg,תמונה
-yyy,Capsule,250 mg,תמונה
-hhh,Liquid (Syrup),10 mL,תמונה
-ggg,Injection (Shot),1 mL,תמונה
-eee,Inhaler,2 puffs,תמונה
-ppp,Topical (Cream/Ointment),15 g,תמונה
-lll,Suppository,100 mg,תמונה
-bbb,Patch (Transdermal),0.5 mg/hr,תמונה
-ddd,Drops (Eye/Ear),3 drops,תמונה
-kkk,Powder (for reconstitution),1 g,תמונה
+﻿Medicine Name,Medicine Form,Dose Type,Capacity
+xxx,Pill (Tablet),500 mg,1 Tablet,30 Tablet
+yyy,Capsule,250 mg,1 Capsule,50 Capsule
+hhh,Liquid (Syrup),1 mL, 100 mL
+ggg,Injection (Shot),0.01 mL, 10mL
+eee,Inhaler,1 puff,200 puff
+ppp,Topical (Cream/Ointment),15 g,150 g
+lll,Suppository,1 suppository,12 suppository
+bbb,Patch (Transdermal),1 patch,7 patch
+ddd,Drops (Eye/Ear),1 drop,100 drop
+kkk,Powder (for reconstitution),1 sachet,10 sachet
