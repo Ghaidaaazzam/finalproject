@@ -97,8 +97,6 @@ class _AddPatientPageState extends State<AddPatientPage> {
           .firstWhere((row) => row[0].toString() == _patientIdController.text);
       String fullName =
           "${patientRow[1]} ${patientRow[2]}"; // Assuming FirstName is in the second column and LastName in the third
-      // String phoneNumberFromCsv =
-      //     patientRow[3]; // Assuming PhoneNumber is in the seventh column
       String birthdate =
           patientRow[4]; // Assuming Birthdate is in the fifth column
       String gender = patientRow[7];
@@ -112,6 +110,7 @@ class _AddPatientPageState extends State<AddPatientPage> {
           'Phone Number2': _contactNumberController2.text,
           'Birthdate': birthdate,
           'Gender': gender,
+          'FirstLogin': false, // Set initial value to false
         });
 
         // Clear the text fields after successful submission

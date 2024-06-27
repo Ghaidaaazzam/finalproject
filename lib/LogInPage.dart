@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:finalproject/firebase_options.dart';
+import 'firebase_options.dart';
 import 'forgetPassword.dart';
 import 'myMedicines.dart'; // Import the MyMedicines page
+import 'survey.dart'; // Import the Survey page
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -73,15 +74,19 @@ class _LoginPageState extends State<LoginPage> {
           .get();
 
       if (querySnapshot.docs.isNotEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Login successful!')),
-        );
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => MyMedicines(userId: enteredId),
-          ),
-        );
+        DocumentSnapshot userDoc = querySnapshot.docs.first;
+        bool firstLogin = userDoc['FirstLogin'] ?? false;
+
+        if (firstLogin) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => MyMedicines(userId: enteredId),
+            ),
+          );
+        } else {
+          _showSurveyDialog(enteredId);
+        }
       } else {
         setState(() {
           _isIdInvalid = true;
@@ -94,6 +99,48 @@ class _LoginPageState extends State<LoginPage> {
         SnackBar(content: Text('An error occurred. Please try again.')),
       );
     }
+  }
+
+  void _showSurveyDialog(String userId) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Color.fromARGB(255, 217, 242, 255),
+          title: Text('Welcome!'),
+          content: Text(
+            'We have a fun survey for you to answer! Ready to start?',
+            style: TextStyle(color: Colors.black),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text(
+                'No, log out',
+                style: TextStyle(color: Colors.red),
+              ),
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+            ),
+            TextButton(
+              child: Text(
+                'Yes, let\'s go!',
+                style: TextStyle(color: Colors.green),
+              ),
+              onPressed: () {
+                Navigator.of(context).pop();
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => QuestionScreen(userId: userId),
+                  ),
+                );
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override

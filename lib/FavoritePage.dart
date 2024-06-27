@@ -96,10 +96,11 @@ class FavoritePage extends StatefulWidget {
   final List<String> questions;
   final List<String> images;
 
-  FavoritePage(
-      {required this.userAnswers,
-      required this.questions,
-      required this.images});
+  FavoritePage({
+    required this.userAnswers,
+    required this.questions,
+    required this.images,
+  });
 
   @override
   _FavoritePageState createState() => _FavoritePageState();

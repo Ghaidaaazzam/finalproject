@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'LogInPage.dart'; // Import the LoginPage
-import 'package:flutter_localizations/flutter_localizations.dart'; // Import the localization packages
+import 'myMedicines.dart'; // Import the MyMedicines page
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:timezone/data/latest.dart' as tz;
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  tz.initializeTimeZones();
   runApp(PillPoppinApp());
 }
 
@@ -63,12 +69,17 @@ class PillPoppinApp extends StatelessWidget {
           ),
         ),
       ),
-      home: QuestionScreen(),
+      home: QuestionScreen(
+          userId: '3FCQN3X6Sykn5y01f2xS'), // Replace with actual userId
     );
   }
 }
 
 class QuestionScreen extends StatefulWidget {
+  final String userId;
+
+  QuestionScreen({required this.userId});
+
   @override
   _QuestionScreenState createState() => _QuestionScreenState();
 }
@@ -76,6 +87,7 @@ class QuestionScreen extends StatefulWidget {
 class _QuestionScreenState extends State<QuestionScreen> {
   final PageController _pageController = PageController();
   final List<Widget> _questions = [];
+  final Map<String, String> _surveyAnswers = {};
 
   @override
   void initState() {
@@ -85,33 +97,55 @@ class _QuestionScreenState extends State<QuestionScreen> {
         question: 'What time do you wake up in the morning?',
         pageController: _pageController,
         imagePath: 'images/sun.png', // Image for waking up
+        userId: widget.userId,
         isLast: false,
+        onAnswered: _storeAnswer,
+        surveyAnswers: _surveyAnswers,
       ),
       TimeQuestionScreen(
         question: 'At what time do you have breakfast?',
         pageController: _pageController,
         imagePath: 'images/coffee.png', // Image for breakfast
+        userId: widget.userId,
         isLast: false,
+        onAnswered: _storeAnswer,
+        surveyAnswers: _surveyAnswers,
       ),
       TimeQuestionScreen(
         question: 'What time do you have lunch?',
         pageController: _pageController,
         imagePath: 'images/launch.png', // Image for lunch
+        userId: widget.userId,
         isLast: false,
+        onAnswered: _storeAnswer,
+        surveyAnswers: _surveyAnswers,
       ),
       TimeQuestionScreen(
         question: 'What time do you have dinner?',
         pageController: _pageController,
         imagePath: 'images/dinner.png', // Image for dinner
+        userId: widget.userId,
         isLast: false,
+        onAnswered: _storeAnswer,
+        surveyAnswers: _surveyAnswers,
       ),
       TimeQuestionScreen(
         question: 'What time do you go to bed at night?',
         pageController: _pageController,
         imagePath: 'images/moon.png', // Image for going to bed
+        userId: widget.userId,
         isLast: true,
+        onAnswered: _storeAnswer,
+        surveyAnswers: _surveyAnswers,
       ),
     ]);
+  }
+
+  void _storeAnswer(String question, String answer) {
+    setState(() {
+      _surveyAnswers[question] = answer;
+    });
+    print('Stored answer: $question -> $answer');
   }
 
   @override
@@ -137,12 +171,18 @@ class TimeQuestionScreen extends StatefulWidget {
   final PageController pageController;
   final String imagePath; // Change to use image path
   final bool isLast;
+  final String userId;
+  final void Function(String question, String answer) onAnswered;
+  final Map<String, String> surveyAnswers;
 
   TimeQuestionScreen({
     required this.question,
     required this.pageController,
     required this.imagePath, // Change to use image path
     required this.isLast,
+    required this.userId,
+    required this.onAnswered,
+    required this.surveyAnswers,
   });
 
   @override
@@ -175,7 +215,10 @@ class _TimeQuestionScreenState extends State<TimeQuestionScreen> {
               ),
             ),
           ),
-          child: child!,
+          child: MediaQuery(
+            data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
+            child: child!,
+          ),
         );
       },
     );
@@ -250,11 +293,14 @@ class _TimeQuestionScreenState extends State<TimeQuestionScreen> {
               color: Colors.transparent,
               child: InkWell(
                 onTap: () {
+                  widget.onAnswered(
+                    widget.question,
+                    "${_selectedTime.hour.toString().padLeft(2, '0')}:${_selectedTime.minute.toString().padLeft(2, '0')}",
+                  );
+                  widget.surveyAnswers[widget.question] =
+                      "${_selectedTime.hour.toString().padLeft(2, '0')}:${_selectedTime.minute.toString().padLeft(2, '0')}";
                   if (widget.isLast) {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => LoginPage()),
-                    );
+                    _showSurveyCompletionDialog();
                   } else {
                     widget.pageController.nextPage(
                       duration: Duration(milliseconds: 300),
@@ -365,6 +411,94 @@ class _TimeQuestionScreenState extends State<TimeQuestionScreen> {
           ],
         ),
       ),
+    );
+  }
+
+  void _showSurveyCompletionDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Color.fromARGB(255, 217, 242, 255),
+          title: Text('End of Survey'),
+          content: Text(
+            'You have completed the survey! Do you want to submit your answers?',
+            style: TextStyle(color: Colors.black),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text(
+                'No, go back',
+                style: TextStyle(color: Colors.red),
+              ),
+              onPressed: () {
+                Navigator.of(context)
+                    .pop(); // Close the dialog and stay on the survey
+              },
+            ),
+            TextButton(
+              child: Text(
+                'Yes, submit',
+                style: TextStyle(color: Colors.green),
+              ),
+              onPressed: () {
+                _submitSurvey();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _submitSurvey() async {
+    Navigator.of(context).pop(); // Close the dialog
+
+    // Debug print statements
+    print('Submitting survey answers: ${widget.surveyAnswers}');
+
+    // Check if patient exists
+    final querySnapshot = await FirebaseFirestore.instance
+        .collection('patients')
+        .where('ID', isEqualTo: widget.userId)
+        .get();
+
+    if (querySnapshot.docs.isEmpty) {
+      print('Patient not found.');
+      return;
+    }
+
+    // Patient exists, proceed with adding survey answers
+    DocumentReference patientDoc = querySnapshot.docs.first.reference;
+    CollectionReference surveyCollection = patientDoc.collection('survey');
+
+    // Add each question and answer as a document in the survey collection
+    for (var entry in widget.surveyAnswers.entries) {
+      await surveyCollection
+          .add({
+            'question': entry.key,
+            'answer': entry.value,
+          })
+          .then((value) => print('Survey entry added to Firestore'))
+          .catchError((error) => print('Failed to add survey entry: $error'));
+    }
+
+    // Update FirstLogin field to true
+    await patientDoc.update({'FirstLogin': true}).then((value) {
+      print('FirstLogin updated to true');
+    }).catchError((error) {
+      print('Failed to update FirstLogin: $error');
+    });
+
+    // Navigate to MyMedicines page
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+          builder: (context) => MyMedicines(userId: widget.userId)),
+    );
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Survey submitted successfully!')),
     );
   }
 }
