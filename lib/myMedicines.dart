@@ -6,6 +6,7 @@ import 'UserProfile.dart'; // Import UserProfile
 import 'EditProfilePage.dart'; // Import EditProfilePage
 import 'notification_helper.dart'; // Import NotificationHelper
 import 'package:timezone/data/latest.dart' as tz;
+import 'MedicineStock.dart'; // Import MedicineStock
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -89,6 +90,14 @@ class _MyMedicinesState extends State<MyMedicines> {
   int _selectedIndex = 2;
   late NotificationHelper _notificationHelper;
 
+  void _navigateToMedicineStock() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+          builder: (context) => MedicineStock(userId: widget.userId)),
+    );
+  }
+
   void _onItemTapped(int index) {
     switch (index) {
       case 1:
@@ -99,7 +108,12 @@ class _MyMedicinesState extends State<MyMedicines> {
         );
         break;
       case 2:
-        // Do nothing as we are already on this page
+        // Navigate to the MedicineStock page
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => MedicineStock(userId: widget.userId)),
+        );
         break;
       case 3:
         // Do nothing for Statistics icon
@@ -188,6 +202,51 @@ class _MyMedicinesState extends State<MyMedicines> {
         title: Text('My Medicines'),
         backgroundColor: Color.fromARGB(255, 217, 242, 255),
         iconTheme: IconThemeData(color: Colors.black),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: _navigateToMedicineStock,
+                borderRadius: BorderRadius.circular(30.0),
+                child: Ink(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        Color.fromARGB(255, 244, 167, 193),
+                        Color(0xFFF06292),
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      stops: [0.1, 1.0],
+                    ),
+                    borderRadius: BorderRadius.circular(30.0),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black26,
+                        offset: Offset(0, 4),
+                        blurRadius: 4.0,
+                        spreadRadius: 1.0,
+                      ),
+                    ],
+                  ),
+                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                  child: Center(
+                    child: Text(
+                      'Stock',
+                      style: TextStyle(
+                        fontSize: 18,
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
       backgroundColor: Color.fromARGB(255, 217, 242, 255),
       body: StreamBuilder<QuerySnapshot>(
