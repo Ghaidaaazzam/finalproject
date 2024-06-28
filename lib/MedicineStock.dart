@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/services.dart'; // Add this import for rootBundle
 import 'package:intl/intl.dart';
+import 'dart:convert'; // Add this import for LineSplitter
 
 class MedicineStock extends StatefulWidget {
   final String userId;
@@ -12,6 +14,67 @@ class MedicineStock extends StatefulWidget {
 }
 
 class _MedicineStockState extends State<MedicineStock> {
+  List<String> medicineNames = [];
+  Map<String, String> medicineForms = {};
+  String medicineForm = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadMedicineForms();
+  }
+
+  void _loadMedicineForms() async {
+    final data = await rootBundle.loadString('Excels/Medicine.csv');
+    final lines = LineSplitter.split(data);
+    for (var line in lines) {
+      final values = line.split(',');
+      if (values.isNotEmpty) {
+        medicineNames
+            .add(values[0]); // Assuming the first column is the medicine name
+        if (values.length > 1) {
+          medicineForms[values[0]] =
+              values[1]; // Assuming the second column is the medicine form
+        }
+      }
+    }
+    setState(() {});
+  }
+
+  String _getDailyDoseLabel(String medicineForm) {
+    switch (medicineForm.toLowerCase()) {
+      default:
+        return 'Doses per day';
+    }
+  }
+
+  String _getPillsPerDoseLabel(String medicineForm) {
+    switch (medicineForm.toLowerCase()) {
+      case 'pill (tablet)':
+        return 'Pills per dose';
+      case 'capsule':
+        return 'Capsules per dose';
+      case 'liquid (syrup)':
+        return 'ml per dose';
+      case 'injection (shot)':
+        return 'Injections per dose';
+      case 'inhaler':
+        return 'Puffs per dose';
+      case 'topical (cream/ointment)':
+        return 'Applications per dose';
+      case 'suppository':
+        return 'Suppositories per dose';
+      case 'patch (transdermal)':
+        return 'Patches per dose';
+      case 'drops (eye/ear)':
+        return 'Drops per dose';
+      case 'powder (for reconstitution)':
+        return 'Doses per dose';
+      default:
+        return 'Doses per dose';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -79,6 +142,9 @@ class _MedicineStockState extends State<MedicineStock> {
                   int daysPrescribed = endDate.difference(startDate).inDays + 1;
                   int totalNeeded = dailyDose * pillsPerDose * daysPrescribed;
 
+                  String medicineForm =
+                      medicineForms[prescription['medicineName']] ?? 'dose';
+
                   return Card(
                     color: Colors.white,
                     margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -90,32 +156,36 @@ class _MedicineStockState extends State<MedicineStock> {
                           Text(
                             'Medicine: ${prescription['medicineName']}',
                             style: TextStyle(
-                              fontSize: 18,
+                              fontSize: 28,
                               fontWeight: FontWeight.bold,
                               color: Colors.black,
                             ),
                           ),
                           SizedBox(height: 8),
                           Text(
-                            'Daily Dose: ${prescription['dailyDose']}',
-                            style: TextStyle(color: Colors.black),
+                            'Form: ${medicineForm}',
+                            style: TextStyle(color: Colors.black, fontSize: 22),
                           ),
                           Text(
-                            'Pills per Dose: ${prescription['pillsPerDose']}',
-                            style: TextStyle(color: Colors.black),
+                            '${_getDailyDoseLabel(medicineForm)}: ${prescription['dailyDose']}',
+                            style: TextStyle(color: Colors.black, fontSize: 22),
+                          ),
+                          Text(
+                            '${_getPillsPerDoseLabel(medicineForm)}: ${prescription['pillsPerDose']}',
+                            style: TextStyle(color: Colors.black, fontSize: 22),
                           ),
                           Text(
                             'Start Date: ${prescription['startDate']}',
-                            style: TextStyle(color: Colors.black),
+                            style: TextStyle(color: Colors.black, fontSize: 22),
                           ),
                           Text(
                             'End Date: ${prescription['endDate']}',
-                            style: TextStyle(color: Colors.black),
+                            style: TextStyle(color: Colors.black, fontSize: 22),
                           ),
                           SizedBox(height: 8),
                           Text(
-                            'Total Pills Needed: $totalNeeded',
-                            style: TextStyle(color: Colors.black),
+                            'Total ${medicineForm.toLowerCase()}s Needed: $totalNeeded',
+                            style: TextStyle(color: Colors.black, fontSize: 22),
                           ),
                           // Add any additional information you want to display
                         ],

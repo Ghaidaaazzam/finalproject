@@ -231,12 +231,13 @@ class _MyMedicinesState extends State<MyMedicines> {
                       ),
                     ],
                   ),
-                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                  padding: EdgeInsets.symmetric(
+                      horizontal: 8, vertical: 8), // Adjusted padding
                   child: Center(
                     child: Text(
-                      'Stock',
+                      'My Medicines Stock',
                       style: TextStyle(
-                        fontSize: 18,
+                        fontSize: 14, // Adjusted font size
                         color: Colors.black,
                         fontWeight: FontWeight.bold,
                       ),
@@ -315,7 +316,7 @@ class _MyMedicinesState extends State<MyMedicines> {
                           Text(
                             'Medicine: ${prescription['medicineName']}',
                             style: TextStyle(
-                              fontSize: 18,
+                              fontSize: 28,
                               fontWeight: FontWeight.bold,
                               color:
                                   Colors.black, // Setting text color to black
@@ -324,31 +325,42 @@ class _MyMedicinesState extends State<MyMedicines> {
                           SizedBox(height: 8),
                           Text(
                             'Daily Dose: ${prescription['dailyDose']}',
-                            style: TextStyle(color: Colors.black), // Text color
+                            style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 22), // Text color
                           ),
                           Text(
                             'Pills per Dose: ${prescription['pillsPerDose']}',
-                            style: TextStyle(color: Colors.black), // Text color
+                            style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 22), // Text color
                           ),
                           Text(
                             'Start Date: ${prescription['startDate']}',
-                            style: TextStyle(color: Colors.black), // Text color
+                            style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 22), // Text color
                           ),
                           Text(
                             'End Date: ${prescription['endDate']}',
-                            style: TextStyle(color: Colors.black), // Text color
+                            style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 22), // Text color
                           ),
                           if (prescription['doctorNotice'] != null &&
                               prescription['doctorNotice'].isNotEmpty)
                             Text(
                               'Doctor\'s Notice: ${prescription['doctorNotice']}',
-                              style:
-                                  TextStyle(color: Colors.black), // Text color
+                              style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 22), // Text color
                             ),
                           SizedBox(height: 8),
                           Text(
                             'Times:',
-                            style: TextStyle(color: Colors.black), // Text color
+                            style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 22), // Text color
                           ),
                           ListView.builder(
                             shrinkWrap: true,
