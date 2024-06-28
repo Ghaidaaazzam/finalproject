@@ -187,18 +187,7 @@ class _UserProfileState extends State<UserProfile> {
                   context,
                   MaterialPageRoute(
                     builder: (context) => FavoritePage(
-                      userAnswers: {
-                        'What time do you wake up in the morning?':
-                            TimeOfDay(hour: 7, minute: 0),
-                        'At what time do you have breakfast?':
-                            TimeOfDay(hour: 8, minute: 0),
-                        'What time do you have lunch?':
-                            TimeOfDay(hour: 12, minute: 0),
-                        'What time do you have dinner?':
-                            TimeOfDay(hour: 18, minute: 0),
-                        'What time do you go to bed at night?':
-                            TimeOfDay(hour: 22, minute: 0),
-                      },
+                      userId: widget.userId,
                       questions: [
                         'What time do you wake up in the morning?',
                         'At what time do you have breakfast?',
