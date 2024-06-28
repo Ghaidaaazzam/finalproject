@@ -5,6 +5,7 @@ import 'EditProfilePage.dart'; // Import the EditProfilePage
 import 'ResetPassword.dart'; // Import the ResetPassword
 import 'MyMedicines.dart'; // Import MyMedicines page
 import 'LoginPage.dart'; // Import the LoginPage
+import 'HelpPage.dart'; // Import the HelpPage
 
 class UserProfile extends StatefulWidget {
   final String userId;
@@ -223,7 +224,14 @@ class _UserProfileState extends State<UserProfile> {
             ProfileMenuItem(
               icon: Icons.help,
               text: 'Help',
-              press: () {},
+              press: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => HelpPage(), // Navigate to HelpPage
+                  ),
+                );
+              },
             ),
             ProfileMenuItem(
               icon: Icons.logout,
