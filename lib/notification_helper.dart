@@ -5,8 +5,10 @@ import 'package:timezone/timezone.dart' as tz;
 
 class NotificationHelper {
   late FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
+  late BuildContext context;
 
-  NotificationHelper() {
+  NotificationHelper(BuildContext context) {
+    this.context = context;
     flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
     final initializationSettingsAndroid =
         AndroidInitializationSettings('app_icon');
@@ -19,6 +21,7 @@ class NotificationHelper {
             (NotificationResponse response) async {
       // Handle notification tapped logic here
       print("Notification Tapped");
+      _showPopup("Time to take your medicine!");
     });
 
     // Initialize timezone data
@@ -63,5 +66,25 @@ class NotificationHelper {
     );
 
     print('Notification scheduled for $scheduleTime');
+  }
+
+  void _showPopup(String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Reminder'),
+          content: Text(message),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
   }
 }

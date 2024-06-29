@@ -1,17 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'UserProfile.dart'; // Import UserProfile
 import 'EditProfilePage.dart'; // Import EditProfilePage
-import 'notification_helper.dart'; // Import NotificationHelper
-import 'package:timezone/data/latest.dart' as tz;
 import 'MedicineStock.dart'; // Import MedicineStock
+import 'package:timezone/data/latest.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
+import 'dart:async';
+import 'notification_helper.dart'; // Import NotificationHelper
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   tz.initializeTimeZones();
+  await _configureLocalTimeZone();
+
   runApp(MyApp());
+}
+
+Future<void> _configureLocalTimeZone() async {
+  tz.initializeTimeZones();
+  final String timeZoneName = await tz.getLocation('Europe/London').name;
+  tz.setLocalLocation(tz.getLocation(timeZoneName));
 }
 
 class MyApp extends StatelessWidget {
@@ -87,8 +96,14 @@ class MyMedicines extends StatefulWidget {
 }
 
 class _MyMedicinesState extends State<MyMedicines> {
+  late NotificationHelper notificationHelper;
   int _selectedIndex = 2;
-  late NotificationHelper _notificationHelper;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    notificationHelper = NotificationHelper(context);
+  }
 
   void _navigateToMedicineStock() {
     Navigator.push(
@@ -119,21 +134,6 @@ class _MyMedicinesState extends State<MyMedicines> {
         // Do nothing for Statistics icon
         break;
     }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    print('User ID: ${widget.userId}');
-    _notificationHelper = NotificationHelper();
-    _requestPermissions();
-  }
-
-  void _requestPermissions() {
-    _notificationHelper.flutterLocalNotificationsPlugin
-        .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>()
-        ?.requestPermission();
   }
 
   Future<void> _selectTime(BuildContext context,
@@ -188,10 +188,8 @@ class _MyMedicinesState extends State<MyMedicines> {
       });
 
       print('Scheduling notification for $picked');
-      await _notificationHelper.scheduleNotification(
-        picked,
-        'Time to take your medicine!',
-      );
+      notificationHelper.scheduleNotification(
+          picked, 'Time to take your medicine!');
     }
   }
 
