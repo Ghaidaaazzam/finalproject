@@ -23,12 +23,13 @@ class _PrescriptionPageState extends State<PrescriptionPage> {
   TextEditingController doctorNoticeController = TextEditingController();
 
   List<String> medicineNames = [];
-  Map<String, String> medicineForms = {};
-  String medicineForm = '';
+  Map<String, Map<String, String>> medicineData = {};
 
   bool _isPatientIdValid = true;
   bool _isFormValid = true;
   String _formErrorMessage = '';
+  String medicineForm = '';
+  String medicineCapacity = '';
 
   @override
   void initState() {
@@ -48,11 +49,14 @@ class _PrescriptionPageState extends State<PrescriptionPage> {
     for (var line in lines) {
       final values = line.split(',');
       if (values.isNotEmpty) {
+        print('Loaded line: $values'); // Debug print
         medicineNames
             .add(values[0]); // Assuming the first column is the medicine name
         if (values.length > 1) {
-          medicineForms[values[0]] =
-              values[1]; // Assuming the second column is the medicine form
+          medicineData[values[0]] = {
+            'form': values[1],
+            'capacity': values[3] // Assuming the fourth column is the capacity
+          };
         }
       }
     }
@@ -254,6 +258,9 @@ class _PrescriptionPageState extends State<PrescriptionPage> {
     String endDate = endDateController.text;
     String doctorNotice = doctorNoticeController.text;
 
+    String capacity = medicineData[medicineName]!['capacity']!;
+    print('Adding prescription with capacity: $capacity'); // Debug print
+
     // Add the prescription to the subcollection
     await prescriptions.add({
       'medicineName': medicineName,
@@ -262,6 +269,7 @@ class _PrescriptionPageState extends State<PrescriptionPage> {
       'startDate': startDate,
       'endDate': endDate,
       'doctorNotice': doctorNotice,
+      'capacity': capacity,
     });
 
     // Show success message
@@ -378,13 +386,21 @@ class _PrescriptionPageState extends State<PrescriptionPage> {
                   onSuggestionSelected: (suggestion) {
                     setState(() {
                       medicineNameController.text = suggestion;
-                      medicineForm = medicineForms[suggestion]!;
+                      medicineForm = medicineData[suggestion]!['form']!;
+                      medicineCapacity = medicineData[suggestion]!['capacity']!;
+                      print(
+                          'Selected medicine: $suggestion, Form: $medicineForm, Capacity: $medicineCapacity'); // Debug print
                     });
                   },
                 ),
                 SizedBox(height: 20),
                 Text(
                   'Selected Medicine Form: $medicineForm',
+                  style: TextStyle(fontSize: 16, color: Colors.blueGrey[900]),
+                ),
+                SizedBox(height: 20),
+                Text(
+                  'Selected Medicine Capacity: $medicineCapacity',
                   style: TextStyle(fontSize: 16, color: Colors.blueGrey[900]),
                 ),
                 SizedBox(height: 20),
