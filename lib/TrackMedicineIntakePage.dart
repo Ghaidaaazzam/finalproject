@@ -16,31 +16,106 @@ class _TrackMedicineIntakePageState extends State<TrackMedicineIntakePage> {
     '323032': {
       'patientName': 'Ghaidaa Azzam',
       'medicineIntake': [
-        {'date': '2023-07-01', 'taken': 2, 'missed': 1},
-        {'date': '2023-07-02', 'taken': 3, 'missed': 0},
-        {'date': '2023-07-03', 'taken': 2, 'missed': 1},
-        {'date': '2023-07-04', 'taken': 3, 'missed': 0},
-        {'date': '2023-07-05', 'taken': 1, 'missed': 2},
+        {
+          'date': '2023-07-01',
+          'medicine': 'Medicine A',
+          'taken': 2,
+          'missed': 1
+        },
+        {
+          'date': '2023-07-02',
+          'medicine': 'Medicine A',
+          'taken': 3,
+          'missed': 0
+        },
+        {
+          'date': '2023-07-03',
+          'medicine': 'Medicine A',
+          'taken': 2,
+          'missed': 1
+        },
+        {
+          'date': '2023-07-04',
+          'medicine': 'Medicine A',
+          'taken': 3,
+          'missed': 0
+        },
+        {
+          'date': '2023-07-05',
+          'medicine': 'Medicine A',
+          'taken': 1,
+          'missed': 2
+        },
       ],
     },
     '987654321': {
       'patientName': 'Mohamad Zoabi',
       'medicineIntake': [
-        {'date': '2023-07-01', 'taken': 1, 'missed': 2},
-        {'date': '2023-07-02', 'taken': 2, 'missed': 1},
-        {'date': '2023-07-03', 'taken': 3, 'missed': 0},
-        {'date': '2023-07-04', 'taken': 1, 'missed': 2},
-        {'date': '2023-07-05', 'taken': 2, 'missed': 1},
+        {
+          'date': '2023-07-01',
+          'medicine': 'Medicine B',
+          'taken': 1,
+          'missed': 2
+        },
+        {
+          'date': '2023-07-02',
+          'medicine': 'Medicine B',
+          'taken': 2,
+          'missed': 1
+        },
+        {
+          'date': '2023-07-03',
+          'medicine': 'Medicine B',
+          'taken': 3,
+          'missed': 0
+        },
+        {
+          'date': '2023-07-04',
+          'medicine': 'Medicine B',
+          'taken': 1,
+          'missed': 2
+        },
+        {
+          'date': '2023-07-05',
+          'medicine': 'Medicine B',
+          'taken': 2,
+          'missed': 1
+        },
       ],
     },
     '123456789': {
       'patientName': 'Yomna Zoabi',
       'medicineIntake': [
-        {'date': '2023-07-01', 'taken': 0, 'missed': 3},
-        {'date': '2023-07-02', 'taken': 1, 'missed': 2},
-        {'date': '2023-07-03', 'taken': 2, 'missed': 1},
-        {'date': '2023-07-04', 'taken': 3, 'missed': 0},
-        {'date': '2023-07-05', 'taken': 1, 'missed': 2},
+        {
+          'date': '2023-07-01',
+          'medicine': 'Medicine C',
+          'taken': 0,
+          'missed': 3
+        },
+        {
+          'date': '2023-07-02',
+          'medicine': 'Medicine C',
+          'taken': 1,
+          'missed': 2
+        },
+        {
+          'date': '2023-07-03',
+          'medicine': 'Medicine C',
+          'taken': 2,
+          'missed': 1
+        },
+        {
+          'date': '2023-07-04',
+          'medicine': 'Medicine C',
+          'taken': 3,
+          'missed': 0
+        },
+        {
+          'date': '2023-07-05',
+          'medicine': 'Medicine C',
+          'taken': 1,
+          'missed': 2
+        },
       ],
     },
   };
@@ -77,6 +152,15 @@ class _TrackMedicineIntakePageState extends State<TrackMedicineIntakePage> {
                       ),
                     ),
                   ],
+                ),
+                SizedBox(height: 8),
+                Text(
+                  'Medicine: ${intake['medicine']}',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.blueGrey[900],
+                  ),
                 ),
                 SizedBox(height: 8),
                 Stack(
@@ -119,7 +203,7 @@ class _TrackMedicineIntakePageState extends State<TrackMedicineIntakePage> {
                         Icon(Icons.cancel, color: Colors.red, size: 18),
                         SizedBox(width: 4),
                         Text(
-                          'Missed: ${intake['missed']}',
+                          'Missed: ${intake['missed']} (${intake['missed']}/$total)',
                           style: TextStyle(fontSize: 14, color: Colors.red),
                         ),
                       ],
@@ -228,6 +312,14 @@ class _TrackMedicineIntakePageState extends State<TrackMedicineIntakePage> {
                 ? Expanded(
                     child: ListView(
                       children: [
+                        Text(
+                          'Patient ID: ${_patientIdController.text}',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.blueGrey[900],
+                          ),
+                        ),
                         Text(
                           'Patient Name: ${patientData['patientName']}',
                           style: TextStyle(
