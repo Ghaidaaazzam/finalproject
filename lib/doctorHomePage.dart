@@ -192,8 +192,10 @@ class _DoctorHomePageState extends State<DoctorHomePage> {
                 itemCount: filteredPrescriptions.length,
                 itemBuilder: (context, index) {
                   var prescription = filteredPrescriptions[index];
-                  int daysLeft =
-                      prescription['endDate'].difference(DateTime.now()).inDays;
+                  int daysLeft = prescription['endDate']
+                          .difference(DateTime.now())
+                          .inDays +
+                      1;
                   bool isUrgent = daysLeft <= 2;
                   return Card(
                     color: isUrgent ? Colors.red[50] : Colors.white,
