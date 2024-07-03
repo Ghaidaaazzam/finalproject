@@ -13,6 +13,7 @@ class _TrackMedicineIntakePageState extends State<TrackMedicineIntakePage> {
   Map<String, dynamic> patientData = {};
   List<Widget> barChartData = [];
   List<String> patientIds = [];
+  String emergencyContact = '';
 
   @override
   void initState() {
@@ -39,6 +40,7 @@ class _TrackMedicineIntakePageState extends State<TrackMedicineIntakePage> {
   Map<String, Map<String, dynamic>> patients = {
     '323032': {
       'patientName': 'Ghaidaa Azzam',
+      'phoneNumber2': '0505661234',
       'medicineIntake': [
         {
           'date': '2023-07-01',
@@ -74,6 +76,7 @@ class _TrackMedicineIntakePageState extends State<TrackMedicineIntakePage> {
     },
     '987654321': {
       'patientName': 'Mohamad Zoabi',
+      'phoneNumber2': '0505665678',
       'medicineIntake': [
         {
           'date': '2023-07-01',
@@ -109,6 +112,7 @@ class _TrackMedicineIntakePageState extends State<TrackMedicineIntakePage> {
     },
     '123456789': {
       'patientName': 'Yomna Zoabi',
+      'phoneNumber2': '0505669999',
       'medicineIntake': [
         {
           'date': '2023-07-01',
@@ -249,12 +253,14 @@ class _TrackMedicineIntakePageState extends State<TrackMedicineIntakePage> {
     if (patients.containsKey(patientId)) {
       setState(() {
         patientData = patients[patientId]!;
+        emergencyContact = patients[patientId]!['phoneNumber2'];
         _generateData();
       });
     } else {
       setState(() {
         patientData = {};
         barChartData = [];
+        emergencyContact = '';
       });
     }
   }
@@ -264,7 +270,59 @@ class _TrackMedicineIntakePageState extends State<TrackMedicineIntakePage> {
       _patientIdController.clear();
       patientData = {};
       barChartData = [];
+      emergencyContact = '';
     });
+  }
+
+  void _showEmergencyContact() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Color.fromARGB(255, 217, 242, 255),
+          title: Text(
+            'Emergency Contact',
+            style: TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+              color: Colors.blueGrey[900],
+            ),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.phone, size: 40, color: Colors.redAccent),
+              SizedBox(height: 10),
+              Text(
+                'Phone Number: $emergencyContact',
+                style: TextStyle(
+                  fontSize: 18,
+                  color: Colors.blueGrey[700],
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              child: Text(
+                'Close',
+                style: TextStyle(
+                  color: Colors.blueGrey[900],
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -367,6 +425,38 @@ class _TrackMedicineIntakePageState extends State<TrackMedicineIntakePage> {
                             color: Colors.blueGrey[900],
                           ),
                         ),
+                        SizedBox(height: 10),
+                        if (emergencyContact.isNotEmpty)
+                          Card(
+                            color: Colors.red[50],
+                            margin: EdgeInsets.symmetric(vertical: 8.0),
+                            elevation: 4,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15.0),
+                            ),
+                            child: ListTile(
+                              leading: Icon(
+                                Icons.phone,
+                                color: Colors.redAccent,
+                                size: 40,
+                              ),
+                              title: Text(
+                                'Emergency Contact',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.redAccent,
+                                ),
+                              ),
+                              subtitle: Text(
+                                emergencyContact,
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.blueGrey[700],
+                                ),
+                              ),
+                            ),
+                          ),
                         SizedBox(height: 10),
                         Column(
                           children: barChartData,
