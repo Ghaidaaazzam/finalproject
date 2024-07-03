@@ -4,6 +4,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:finalproject/firebase_options.dart';
 import 'prescription.dart';
 import 'AddPatient.dart';
+import 'TrackMedicineIntakePage.dart'; // Import the new tracking page
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -23,7 +24,8 @@ class MyApp extends StatelessWidget {
         '/prescription': (context) => PrescriptionPage(),
         '/doctorHome': (context) => DoctorHomePage(),
         '/addPatient': (context) => AddPatientPage(),
-        '/editProfile': (context) => EditProfilePage(),
+        //'/editProfile': (context) => EditProfilePage(),
+        '/trackMedicineIntake': (context) => TrackMedicineIntakePage(),
       },
     );
   }
@@ -100,6 +102,230 @@ class _DoctorHomePageState extends State<DoctorHomePage> {
         Navigator.pushNamed(context, '/editProfile');
         break;
     }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    DateFormat dateFormat = DateFormat('yyyy-MM-dd');
+    List<Map<String, dynamic>> filteredPrescriptions =
+        prescriptions.where((prescription) {
+      int daysLeft = prescription['endDate'].difference(DateTime.now()).inDays;
+      return (idFilter.isEmpty ||
+              prescription['patientId'].contains(idFilter)) &&
+          (daysLeftFilter == null || daysLeft <= daysLeftFilter!);
+    }).toList();
+
+    return Scaffold(
+      backgroundColor: Color.fromARGB(255, 217, 242, 255),
+      appBar: AppBar(
+        title: Text('Doctor Home Page'),
+        backgroundColor: Color.fromARGB(255, 244, 167, 193),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.refresh),
+            onPressed: () {
+              setState(() {
+                // אפשרות לרענן את הנתונים
+                // כרגע זה לא מבצע פעולה אמיתית כיוון שהנתונים ידניים
+              });
+            },
+          ),
+          IconButton(
+            icon: Icon(Icons.add),
+            onPressed: () {
+              Navigator.pushNamed(context, '/prescription');
+            },
+          ),
+        ],
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            Text(
+              'Prescriptions Ending Soon',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Colors.blueGrey[900],
+              ),
+            ),
+            SizedBox(height: 16),
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    decoration: InputDecoration(
+                      labelText: 'Filter by ID',
+                      border: OutlineInputBorder(),
+                      prefixIcon: Icon(Icons.search),
+                    ),
+                    onChanged: (value) {
+                      setState(() {
+                        idFilter = value;
+                      });
+                    },
+                  ),
+                ),
+                SizedBox(width: 10),
+                Expanded(
+                  child: TextField(
+                    decoration: InputDecoration(
+                      labelText: 'Days Left (<=)',
+                      border: OutlineInputBorder(),
+                      prefixIcon: Icon(Icons.filter_alt),
+                    ),
+                    keyboardType: TextInputType.number,
+                    onChanged: (value) {
+                      setState(() {
+                        daysLeftFilter =
+                            value.isEmpty ? null : int.tryParse(value);
+                      });
+                    },
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 16),
+            Expanded(
+              child: ListView.builder(
+                itemCount: filteredPrescriptions.length,
+                itemBuilder: (context, index) {
+                  var prescription = filteredPrescriptions[index];
+                  int daysLeft =
+                      prescription['endDate'].difference(DateTime.now()).inDays;
+                  bool isUrgent = daysLeft <= 2;
+                  return Card(
+                    color: isUrgent ? Colors.red[50] : Colors.white,
+                    margin: EdgeInsets.symmetric(vertical: 8),
+                    child: ListTile(
+                      leading: isUrgent
+                          ? Icon(Icons.warning, color: Colors.red)
+                          : null,
+                      title: Text(
+                        '${prescription['patientName']} (ID: ${prescription['patientId']})',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.blueGrey[900],
+                        ),
+                      ),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '${prescription['medicineName']} - Ends on: ${dateFormat.format(prescription['endDate'])}',
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.blueGrey[700],
+                            ),
+                          ),
+                          Text(
+                            'Days left: $daysLeft',
+                            style: TextStyle(
+                              fontSize: 16,
+                              color:
+                                  isUrgent ? Colors.red : Colors.blueGrey[700],
+                              fontWeight: isUrgent
+                                  ? FontWeight.bold
+                                  : FontWeight.normal,
+                            ),
+                          ),
+                        ],
+                      ),
+                      trailing: IconButton(
+                        icon: Icon(Icons.edit),
+                        onPressed: () => _renewPrescription(prescription),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+            SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pushNamed(context, '/trackMedicineIntake');
+              },
+              child: Text('Track Medicine Intake'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Color.fromARGB(255, 244, 167, 193),
+                foregroundColor: Colors.blueGrey[900],
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                textStyle: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _selectedIndex,
+        onTap: _onItemTapped,
+        items: [
+          BottomNavigationBarItem(
+            icon: Image.asset(
+              'images/SmallLogo.png',
+              height: 50.0,
+              width: 50.0,
+            ),
+            label: 'Logo',
+          ),
+          BottomNavigationBarItem(
+            icon: Image.asset(
+              'images/prescriptionIcon.png',
+              height: 50.0,
+              width: 50.0,
+            ),
+            label: 'Prescription',
+          ),
+          BottomNavigationBarItem(
+            icon: Stack(
+              children: <Widget>[
+                Icon(
+                  Icons.person,
+                  color: Colors.black,
+                  size: 40,
+                ),
+                Positioned(
+                  right: 0,
+                  bottom: 0,
+                  child: Icon(
+                    Icons.add_circle,
+                    color: Colors.blue,
+                    size: 24,
+                  ),
+                ),
+              ],
+            ),
+            label: 'Add Patient',
+          ),
+          BottomNavigationBarItem(
+            icon: Stack(
+              children: <Widget>[
+                Icon(
+                  Icons.person,
+                  color: Colors.black,
+                  size: 40,
+                ),
+                Positioned(
+                  right: 0,
+                  bottom: 0,
+                  child: Icon(
+                    Icons.edit,
+                    color: Colors.blue,
+                    size: 24,
+                  ),
+                ),
+              ],
+            ),
+            label: 'Edit Profile',
+          ),
+        ],
+      ),
+    );
   }
 
   void _renewPrescription(Map<String, dynamic> prescription) {
@@ -275,228 +501,6 @@ class _DoctorHomePageState extends State<DoctorHomePage> {
           ),
         );
       },
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    DateFormat dateFormat = DateFormat('yyyy-MM-dd');
-    List<Map<String, dynamic>> filteredPrescriptions =
-        prescriptions.where((prescription) {
-      int daysLeft = prescription['endDate'].difference(DateTime.now()).inDays;
-      return (idFilter.isEmpty ||
-              prescription['patientId'].contains(idFilter)) &&
-          (daysLeftFilter == null || daysLeft <= daysLeftFilter!);
-    }).toList();
-
-    return Scaffold(
-      backgroundColor: Color.fromARGB(255, 217, 242, 255),
-      appBar: AppBar(
-        title: Text('Doctor Home Page'),
-        backgroundColor: Color.fromARGB(255, 244, 167, 193),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.refresh),
-            onPressed: () {
-              setState(() {
-                // אפשרות לרענן את הנתונים
-                // כרגע זה לא מבצע פעולה אמיתית כיוון שהנתונים ידניים
-              });
-            },
-          ),
-          IconButton(
-            icon: Icon(Icons.add),
-            onPressed: () {
-              Navigator.pushNamed(context, '/prescription');
-            },
-          ),
-        ],
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            Text(
-              'Prescriptions Ending Soon',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: Colors.blueGrey[900],
-              ),
-            ),
-            SizedBox(height: 16),
-            Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    decoration: InputDecoration(
-                      labelText: 'Filter by ID',
-                      border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.search),
-                    ),
-                    onChanged: (value) {
-                      setState(() {
-                        idFilter = value;
-                      });
-                    },
-                  ),
-                ),
-                SizedBox(width: 10),
-                Expanded(
-                  child: TextField(
-                    decoration: InputDecoration(
-                      labelText: 'Days Left (<=)',
-                      border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.filter_alt),
-                    ),
-                    keyboardType: TextInputType.number,
-                    onChanged: (value) {
-                      setState(() {
-                        daysLeftFilter =
-                            value.isEmpty ? null : int.tryParse(value);
-                      });
-                    },
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: 16),
-            Expanded(
-              child: ListView.builder(
-                itemCount: filteredPrescriptions.length,
-                itemBuilder: (context, index) {
-                  var prescription = filteredPrescriptions[index];
-                  int daysLeft =
-                      prescription['endDate'].difference(DateTime.now()).inDays;
-                  bool isUrgent = daysLeft <= 2;
-                  return Card(
-                    color: isUrgent ? Colors.red[50] : Colors.white,
-                    margin: EdgeInsets.symmetric(vertical: 8),
-                    child: ListTile(
-                      leading: isUrgent
-                          ? Icon(Icons.warning, color: Colors.red)
-                          : null,
-                      title: Text(
-                        '${prescription['patientName']} (ID: ${prescription['patientId']})',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.blueGrey[900],
-                        ),
-                      ),
-                      subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            '${prescription['medicineName']} - Ends on: ${dateFormat.format(prescription['endDate'])}',
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.blueGrey[700],
-                            ),
-                          ),
-                          Text(
-                            'Days left: $daysLeft',
-                            style: TextStyle(
-                              fontSize: 16,
-                              color:
-                                  isUrgent ? Colors.red : Colors.blueGrey[700],
-                              fontWeight: isUrgent
-                                  ? FontWeight.bold
-                                  : FontWeight.normal,
-                            ),
-                          ),
-                        ],
-                      ),
-                      trailing: IconButton(
-                        icon: Icon(Icons.edit),
-                        onPressed: () => _renewPrescription(prescription),
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
-        items: [
-          BottomNavigationBarItem(
-            icon: Image.asset(
-              'images/SmallLogo.png',
-              height: 50.0,
-              width: 50.0,
-            ),
-            label: 'Logo',
-          ),
-          BottomNavigationBarItem(
-            icon: Image.asset(
-              'images/prescriptionIcon.png',
-              height: 50.0,
-              width: 50.0,
-            ),
-            label: 'Prescription',
-          ),
-          BottomNavigationBarItem(
-            icon: Stack(
-              children: <Widget>[
-                Icon(
-                  Icons.person,
-                  color: Colors.black,
-                  size: 40,
-                ),
-                Positioned(
-                  right: 0,
-                  bottom: 0,
-                  child: Icon(
-                    Icons.add_circle,
-                    color: Colors.blue,
-                    size: 24,
-                  ),
-                ),
-              ],
-            ),
-            label: 'Add Patient',
-          ),
-          BottomNavigationBarItem(
-            icon: Stack(
-              children: <Widget>[
-                Icon(
-                  Icons.person,
-                  color: Colors.black,
-                  size: 40,
-                ),
-                Positioned(
-                  right: 0,
-                  bottom: 0,
-                  child: Icon(
-                    Icons.edit,
-                    color: Colors.blue,
-                    size: 24,
-                  ),
-                ),
-              ],
-            ),
-            label: 'Edit Profile',
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class EditProfilePage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: Text(
-          'Edit Profile Page',
-          style: TextStyle(fontSize: 24),
-        ),
-      ),
     );
   }
 }

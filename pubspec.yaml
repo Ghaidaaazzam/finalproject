@@ -9,6 +9,7 @@ dependencies:
     sdk: flutter
   flutter_localizations:
     sdk: flutter
+  fl_chart: ^0.40.0
   csv: ^5.0.0
   flutter_typeahead: ^4.0.0
   path_provider: ^2.0.11
