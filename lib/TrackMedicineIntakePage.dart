@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_typeahead/flutter_typeahead.dart';
 
 class TrackMedicineIntakePage extends StatefulWidget {
   @override
@@ -10,8 +12,30 @@ class _TrackMedicineIntakePageState extends State<TrackMedicineIntakePage> {
   TextEditingController _patientIdController = TextEditingController();
   Map<String, dynamic> patientData = {};
   List<Widget> barChartData = [];
+  List<String> patientIds = [];
 
-  // נתונים מדומים של מטופלים
+  @override
+  void initState() {
+    super.initState();
+    fetchPatientIds();
+  }
+
+  Future<void> fetchPatientIds() async {
+    try {
+      QuerySnapshot snapshot =
+          await FirebaseFirestore.instance.collection('patients').get();
+      List<String> ids = snapshot.docs
+          .map((doc) => (doc.data() as Map<String, dynamic>)['ID'].toString())
+          .toList();
+      setState(() {
+        patientIds = ids;
+      });
+    } catch (e) {
+      print('Error fetching patient IDs: $e');
+    }
+  }
+
+  // Dummy data for patients
   Map<String, Map<String, dynamic>> patients = {
     '323032': {
       'patientName': 'Ghaidaa Azzam',
@@ -221,9 +245,7 @@ class _TrackMedicineIntakePageState extends State<TrackMedicineIntakePage> {
     });
   }
 
-  void _searchPatient() {
-    // פונקציה לביצוע חיפוש מטופל לפי תעודת זהות
-    String patientId = _patientIdController.text;
+  void _searchPatient(String patientId) {
     if (patients.containsKey(patientId)) {
       setState(() {
         patientData = patients[patientId]!;
@@ -257,24 +279,41 @@ class _TrackMedicineIntakePageState extends State<TrackMedicineIntakePage> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            TextField(
-              controller: _patientIdController,
-              decoration: InputDecoration(
-                labelText: 'Enter Patient ID',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(15.0),
+            TypeAheadFormField<String?>(
+              textFieldConfiguration: TextFieldConfiguration(
+                controller: _patientIdController,
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  labelText: 'Enter Patient ID',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(15.0),
+                  ),
+                  prefixIcon: Icon(Icons.search),
+                  filled: true,
+                  fillColor: Colors.white,
                 ),
-                prefixIcon: Icon(Icons.search),
-                filled: true,
-                fillColor: Colors.white,
               ),
+              suggestionsCallback: (pattern) {
+                return patientIds.where((id) => id.contains(pattern));
+              },
+              itemBuilder: (context, String? suggestion) {
+                return ListTile(
+                  title: Text(suggestion!),
+                );
+              },
+              onSuggestionSelected: (String? suggestion) {
+                if (suggestion != null) {
+                  _patientIdController.text = suggestion;
+                  _searchPatient(suggestion);
+                }
+              },
             ),
             SizedBox(height: 10),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 ElevatedButton(
-                  onPressed: _searchPatient,
+                  onPressed: () => _searchPatient(_patientIdController.text),
                   child: Text('Search'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Color.fromARGB(255, 244, 167, 193),
