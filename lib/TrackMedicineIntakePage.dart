@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:fl_chart/fl_chart.dart';
 
 class TrackMedicineIntakePage extends StatefulWidget {
   @override
@@ -10,8 +9,7 @@ class TrackMedicineIntakePage extends StatefulWidget {
 class _TrackMedicineIntakePageState extends State<TrackMedicineIntakePage> {
   TextEditingController _patientIdController = TextEditingController();
   Map<String, dynamic> patientData = {};
-  List<BarChartGroupData> barChartData = [];
-  String errorMessage = '';
+  List<Widget> barChartData = [];
 
   // נתונים מדומים של מטופלים
   Map<String, Map<String, dynamic>> patients = {
@@ -48,29 +46,91 @@ class _TrackMedicineIntakePageState extends State<TrackMedicineIntakePage> {
   };
 
   void _generateData() {
-    List<BarChartGroupData> tempList = [];
-    int index = 1;
+    List<Widget> tempList = [];
     for (var intake in patientData['medicineIntake']) {
+      double total = intake['taken'].toDouble() + intake['missed'].toDouble();
+      double takenPercentage = intake['taken'].toDouble() / total;
+      double missedPercentage = intake['missed'].toDouble() / total;
+
       tempList.add(
-        BarChartGroupData(
-          x: index,
-          barRods: [
-            BarChartRodData(
-              y: intake['taken'].toDouble(),
-              colors: [Colors.green],
-              width: 8,
-              borderRadius: const BorderRadius.all(Radius.zero),
+        Card(
+          margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
+          elevation: 4,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15.0),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(Icons.calendar_today, color: Colors.blueGrey[900]),
+                    SizedBox(width: 8),
+                    Text(
+                      intake['date'],
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blueGrey[900],
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 8),
+                Stack(
+                  children: [
+                    Container(
+                      height: 20,
+                      decoration: BoxDecoration(
+                        color: Colors.red.withOpacity(missedPercentage),
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                    ),
+                    FractionallySizedBox(
+                      widthFactor: takenPercentage,
+                      child: Container(
+                        height: 20,
+                        decoration: BoxDecoration(
+                          color: Colors.green,
+                          borderRadius: BorderRadius.circular(5),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 8),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(Icons.check_circle, color: Colors.green, size: 18),
+                        SizedBox(width: 4),
+                        Text(
+                          'Taken: ${intake['taken']}',
+                          style: TextStyle(fontSize: 14, color: Colors.green),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        Icon(Icons.cancel, color: Colors.red, size: 18),
+                        SizedBox(width: 4),
+                        Text(
+                          'Missed: ${intake['missed']}',
+                          style: TextStyle(fontSize: 14, color: Colors.red),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ],
             ),
-            BarChartRodData(
-              y: intake['missed'].toDouble(),
-              colors: [Colors.red],
-              width: 8,
-              borderRadius: const BorderRadius.all(Radius.zero),
-            ),
-          ],
+          ),
         ),
       );
-      index++;
     }
     setState(() {
       barChartData = tempList;
@@ -84,23 +144,20 @@ class _TrackMedicineIntakePageState extends State<TrackMedicineIntakePage> {
       setState(() {
         patientData = patients[patientId]!;
         _generateData();
-        errorMessage = '';
       });
     } else {
       setState(() {
         patientData = {};
         barChartData = [];
-        errorMessage = 'No data available for the entered ID.';
       });
     }
   }
 
-  void _resetFields() {
+  void _resetSearch() {
     setState(() {
       _patientIdController.clear();
       patientData = {};
       barChartData = [];
-      errorMessage = '';
     });
   }
 
@@ -120,12 +177,17 @@ class _TrackMedicineIntakePageState extends State<TrackMedicineIntakePage> {
               controller: _patientIdController,
               decoration: InputDecoration(
                 labelText: 'Enter Patient ID',
-                border: OutlineInputBorder(),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(15.0),
+                ),
                 prefixIcon: Icon(Icons.search),
+                filled: true,
+                fillColor: Colors.white,
               ),
             ),
             SizedBox(height: 10),
             Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 ElevatedButton(
                   onPressed: _searchPatient,
@@ -138,11 +200,13 @@ class _TrackMedicineIntakePageState extends State<TrackMedicineIntakePage> {
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15.0),
+                    ),
                   ),
                 ),
-                SizedBox(width: 10),
                 ElevatedButton(
-                  onPressed: _resetFields,
+                  onPressed: _resetSearch,
                   child: Text('Reset'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Color.fromARGB(255, 244, 167, 193),
@@ -152,129 +216,29 @@ class _TrackMedicineIntakePageState extends State<TrackMedicineIntakePage> {
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15.0),
+                    ),
                   ),
                 ),
               ],
             ),
             SizedBox(height: 20),
-            if (errorMessage.isNotEmpty)
-              Text(
-                errorMessage,
-                style: TextStyle(
-                  fontSize: 18,
-                  color: Colors.red,
-                ),
-              ),
             patientData.isNotEmpty
                 ? Expanded(
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    child: ListView(
                       children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Patient Name: ${patientData['patientName']}',
-                                style: TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.blueGrey[900],
-                                ),
-                              ),
-                              SizedBox(height: 10),
-                              Expanded(
-                                child: Padding(
-                                  padding: const EdgeInsets.only(
-                                      left: 16.0, right: 16.0),
-                                  child: BarChart(
-                                    BarChartData(
-                                      barGroups: barChartData,
-                                      titlesData: FlTitlesData(
-                                        leftTitles: SideTitles(
-                                          showTitles: true,
-                                          getTextStyles: (context, value) =>
-                                              const TextStyle(
-                                            color: Colors.black,
-                                            fontSize: 14,
-                                          ),
-                                          margin: 16,
-                                          reservedSize: 28,
-                                          interval: 1,
-                                        ),
-                                        bottomTitles: SideTitles(
-                                          showTitles: true,
-                                          getTextStyles: (context, value) =>
-                                              const TextStyle(
-                                            color: Colors.black,
-                                            fontSize: 14,
-                                          ),
-                                          margin: 16,
-                                          getTitles: (double value) {
-                                            switch (value.toInt()) {
-                                              case 1:
-                                                return '01/07';
-                                              case 2:
-                                                return '02/07';
-                                              case 3:
-                                                return '03/07';
-                                              case 4:
-                                                return '04/07';
-                                              case 5:
-                                                return '05/07';
-                                            }
-                                            return '';
-                                          },
-                                        ),
-                                      ),
-                                      borderData: FlBorderData(show: true),
-                                      gridData: FlGridData(show: true),
-                                      barTouchData: BarTouchData(
-                                        touchTooltipData: BarTouchTooltipData(
-                                          tooltipBgColor: Colors.grey,
-                                          getTooltipItem: (group, groupIndex,
-                                              rod, rodIndex) {
-                                            return BarTooltipItem(
-                                              '${rod.y}',
-                                              TextStyle(color: rod.colors[0]),
-                                            );
-                                          },
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              SizedBox(height: 10),
-                              Center(
-                                child: Text(
-                                  'Date',
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.blueGrey[900],
-                                  ),
-                                ),
-                              ),
-                            ],
+                        Text(
+                          'Patient Name: ${patientData['patientName']}',
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.blueGrey[900],
                           ),
                         ),
-                        SizedBox(width: 10),
-                        Padding(
-                          padding: const EdgeInsets.only(
-                              top:
-                                  190.0), // Adjust the value to position the title lower
-                          child: RotatedBox(
-                            quarterTurns: -1,
-                            child: Text(
-                              'Number of Intakes/Misses',
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.blueGrey[900],
-                              ),
-                            ),
-                          ),
+                        SizedBox(height: 10),
+                        Column(
+                          children: barChartData,
                         ),
                       ],
                     ),
@@ -294,3 +258,7 @@ class _TrackMedicineIntakePageState extends State<TrackMedicineIntakePage> {
     );
   }
 }
+
+void main() => runApp(MaterialApp(
+      home: TrackMedicineIntakePage(),
+    ));
