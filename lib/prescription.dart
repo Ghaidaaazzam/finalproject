@@ -23,13 +23,13 @@ class _PrescriptionPageState extends State<PrescriptionPage> {
   TextEditingController doctorNoticeController = TextEditingController();
 
   List<String> medicineNames = [];
-  Map<String, Map<String, String>> medicineData = {};
+  Map<String, Map<String, dynamic>> medicineData = {};
 
   bool _isPatientIdValid = true;
   bool _isFormValid = true;
   String _formErrorMessage = '';
   String medicineForm = '';
-  String medicineCapacity = '';
+  int medicineCapacity = 0;
 
   @override
   void initState() {
@@ -52,15 +52,24 @@ class _PrescriptionPageState extends State<PrescriptionPage> {
         print('Loaded line: $values'); // Debug print
         medicineNames
             .add(values[0]); // Assuming the first column is the medicine name
-        if (values.length > 1) {
-          medicineData[values[0]] = {
-            'form': values[1],
-            'capacity': values[3] // Assuming the fourth column is the capacity
-          };
+        if (values.length > 4) {
+          final capacity = _extractNumber(
+              values[4]); // Extract numerical part from the fourth column
+          print(
+              'Extracted capacity for ${values[0]}: $capacity'); // Debug print
+          medicineData[values[0]] = {'form': values[1], 'capacity': capacity};
+        } else {
+          print('Error: Unexpected format in line: $line');
         }
       }
     }
     setState(() {});
+  }
+
+  int _extractNumber(String input) {
+    final RegExp regex = RegExp(r'\d+');
+    final match = regex.firstMatch(input);
+    return match != null ? int.parse(match.group(0)!) : 0;
   }
 
   Future<void> _checkPatientId(String id) async {
@@ -119,38 +128,36 @@ class _PrescriptionPageState extends State<PrescriptionPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          backgroundColor:
-              Color.fromARGB(255, 255, 228, 237), // Kept background color
+          backgroundColor: Color.fromARGB(255, 255, 228, 237),
           title: Text(
             'Cancel Confirmation',
             style: TextStyle(
-              fontSize: 18, // Increased font size
+              fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: Colors.black, // Text color changed to black
+              color: Colors.black,
             ),
           ),
           content: Text(
             'Are you sure you want to cancel?',
             style: TextStyle(
-              fontSize: 18, // Increased font size for the note
-              color: Colors.black, // Text color changed to black
+              fontSize: 18,
+              color: Colors.black,
             ),
           ),
           actions: <Widget>[
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
+                Navigator.of(context).pop();
               },
               child: Text('No'),
               style: TextButton.styleFrom(
-                foregroundColor: Colors.black, // Text color changed to black
+                foregroundColor: Colors.black,
               ),
             ),
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
+                Navigator.of(context).pop();
                 setState(() {
-                  // Clear all the fields
                   patientIdController.clear();
                   medicineNameController.clear();
                   dailyDoseController.clear();
@@ -162,7 +169,7 @@ class _PrescriptionPageState extends State<PrescriptionPage> {
               },
               child: Text('Yes'),
               style: TextButton.styleFrom(
-                foregroundColor: Colors.black, // Text color changed to black
+                foregroundColor: Colors.black,
               ),
             ),
           ],
@@ -196,7 +203,6 @@ class _PrescriptionPageState extends State<PrescriptionPage> {
 
   Future<void> _addPrescription() async {
     if (!_validateForm()) {
-      // Show error message
       showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -219,14 +225,12 @@ class _PrescriptionPageState extends State<PrescriptionPage> {
 
     String patientId = patientIdController.text;
 
-    // Check if patient exists
     final querySnapshot = await FirebaseFirestore.instance
         .collection('patients')
         .where('ID', isEqualTo: patientId)
         .get();
 
     if (querySnapshot.docs.isEmpty) {
-      // Show an error message if the patient does not exist
       showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -247,22 +251,25 @@ class _PrescriptionPageState extends State<PrescriptionPage> {
       return;
     }
 
-    // Patient exists, proceed with adding prescription
     DocumentReference patientDoc = querySnapshot.docs.first.reference;
     CollectionReference prescriptions = patientDoc.collection('prescriptions');
 
     String medicineName = medicineNameController.text;
     String dailyDose = dailyDoseController.text;
-    String pillsPerDose = pillsPerDoseController.text;
+    int pillsPerDose =
+        int.parse(pillsPerDoseController.text); // Parsing as integer
     String startDate = startDateController.text;
     String endDate = endDateController.text;
     String doctorNotice = doctorNoticeController.text;
 
-    String capacity = medicineData[medicineName]!['capacity']!;
+    int capacity = medicineData[medicineName]!['capacity'] as int;
     print('Adding prescription with capacity: $capacity'); // Debug print
 
-    // Add the prescription to the subcollection
-    await prescriptions.add({
+    DocumentReference newPrescriptionRef = prescriptions.doc();
+    String prescriptionId = newPrescriptionRef.id;
+
+    await newPrescriptionRef.set({
+      'prescriptionId': prescriptionId,
       'medicineName': medicineName,
       'dailyDose': dailyDose,
       'pillsPerDose': pillsPerDose,
@@ -272,7 +279,6 @@ class _PrescriptionPageState extends State<PrescriptionPage> {
       'capacity': capacity,
     });
 
-    // Show success message
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -291,7 +297,6 @@ class _PrescriptionPageState extends State<PrescriptionPage> {
       },
     );
 
-    // Clear all the fields
     setState(() {
       patientIdController.clear();
       medicineNameController.clear();
@@ -331,13 +336,13 @@ class _PrescriptionPageState extends State<PrescriptionPage> {
                 TextField(
                   controller: patientIdController,
                   keyboardType: TextInputType.number,
-                  style: TextStyle(fontSize: 16), // Adjusted font size
+                  style: TextStyle(fontSize: 16),
                   decoration: InputDecoration(
                     prefixIcon: Icon(Icons.account_circle),
                     labelText: 'Patient Id',
                     labelStyle: TextStyle(
                       color: Colors.blueGrey[900],
-                      fontSize: 16, // Adjusted font size
+                      fontSize: 16,
                       fontWeight: FontWeight.w600,
                     ),
                     border: OutlineInputBorder(
@@ -355,13 +360,13 @@ class _PrescriptionPageState extends State<PrescriptionPage> {
                 TypeAheadField<String>(
                   textFieldConfiguration: TextFieldConfiguration(
                     controller: medicineNameController,
-                    style: TextStyle(fontSize: 16), // Adjusted font size
+                    style: TextStyle(fontSize: 16),
                     decoration: InputDecoration(
                       prefixIcon: Icon(Icons.medical_services),
                       labelText: 'Name of Medicine',
                       labelStyle: TextStyle(
                         color: Colors.blueGrey[900],
-                        fontSize: 16, // Adjusted font size
+                        fontSize: 16,
                         fontWeight: FontWeight.w600,
                       ),
                       border: OutlineInputBorder(
@@ -407,13 +412,13 @@ class _PrescriptionPageState extends State<PrescriptionPage> {
                 TextField(
                   controller: dailyDoseController,
                   keyboardType: TextInputType.number,
-                  style: TextStyle(fontSize: 16), // Adjusted font size
+                  style: TextStyle(fontSize: 16),
                   decoration: InputDecoration(
                     prefixIcon: Icon(Icons.repeat),
                     labelText: _getDailyDoseLabel(),
                     labelStyle: TextStyle(
                       color: Colors.blueGrey[900],
-                      fontSize: 16, // Adjusted font size
+                      fontSize: 16,
                       fontWeight: FontWeight.w600,
                     ),
                     border: OutlineInputBorder(
@@ -430,13 +435,13 @@ class _PrescriptionPageState extends State<PrescriptionPage> {
                 TextField(
                   controller: pillsPerDoseController,
                   keyboardType: TextInputType.number,
-                  style: TextStyle(fontSize: 16), // Adjusted font size
+                  style: TextStyle(fontSize: 16),
                   decoration: InputDecoration(
                     prefixIcon: Icon(Icons.format_list_numbered),
                     labelText: _getPillsPerDoseLabel(),
                     labelStyle: TextStyle(
                       color: Colors.blueGrey[900],
-                      fontSize: 16, // Adjusted font size
+                      fontSize: 16,
                       fontWeight: FontWeight.w600,
                     ),
                     border: OutlineInputBorder(
@@ -452,13 +457,13 @@ class _PrescriptionPageState extends State<PrescriptionPage> {
                 SizedBox(height: 20),
                 TextField(
                   controller: startDateController,
-                  style: TextStyle(fontSize: 16), // Adjusted font size
+                  style: TextStyle(fontSize: 16),
                   decoration: InputDecoration(
                     prefixIcon: Icon(Icons.date_range),
                     labelText: 'Enter the start Date',
                     labelStyle: TextStyle(
                       color: Colors.blueGrey[900],
-                      fontSize: 16, // Adjusted font size
+                      fontSize: 16,
                       fontWeight: FontWeight.w600,
                     ),
                     border: OutlineInputBorder(
@@ -478,13 +483,13 @@ class _PrescriptionPageState extends State<PrescriptionPage> {
                 SizedBox(height: 20),
                 TextField(
                   controller: endDateController,
-                  style: TextStyle(fontSize: 16), // Adjusted font size
+                  style: TextStyle(fontSize: 16),
                   decoration: InputDecoration(
                     prefixIcon: Icon(Icons.date_range),
                     labelText: 'Enter the end Date',
                     labelStyle: TextStyle(
                       color: Colors.blueGrey[900],
-                      fontSize: 16, // Adjusted font size
+                      fontSize: 16,
                       fontWeight: FontWeight.w600,
                     ),
                     border: OutlineInputBorder(
@@ -504,13 +509,13 @@ class _PrescriptionPageState extends State<PrescriptionPage> {
                 SizedBox(height: 20),
                 TextField(
                   controller: doctorNoticeController,
-                  style: TextStyle(fontSize: 16), // Adjusted font size
+                  style: TextStyle(fontSize: 16),
                   decoration: InputDecoration(
                     prefixIcon: Icon(Icons.notes),
                     labelText: 'Doctor Notice',
                     labelStyle: TextStyle(
                       color: Colors.blueGrey[900],
-                      fontSize: 16, // Adjusted font size
+                      fontSize: 16,
                       fontWeight: FontWeight.w600,
                     ),
                     border: OutlineInputBorder(
@@ -565,13 +570,12 @@ class _PrescriptionPageState extends State<PrescriptionPage> {
                               ],
                             ),
                             padding: EdgeInsets.symmetric(
-                                horizontal: 12,
-                                vertical: 12), // Adjusted padding
+                                horizontal: 12, vertical: 12),
                             child: Center(
                               child: Text(
                                 'Cancel',
                                 style: TextStyle(
-                                  fontSize: 18, // Adjusted font size
+                                  fontSize: 18,
                                   color: Colors.black,
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -610,13 +614,12 @@ class _PrescriptionPageState extends State<PrescriptionPage> {
                               ],
                             ),
                             padding: EdgeInsets.symmetric(
-                                horizontal: 12,
-                                vertical: 12), // Adjusted padding
+                                horizontal: 12, vertical: 12),
                             child: Center(
                               child: Text(
                                 'Submit',
                                 style: TextStyle(
-                                  fontSize: 18, // Adjusted font size
+                                  fontSize: 18,
                                   color: Colors.black,
                                   fontWeight: FontWeight.bold,
                                 ),
