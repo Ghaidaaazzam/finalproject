@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
+import 'package:url_launcher/url_launcher.dart'; // Import the url_launcher package
 
 class TrackMedicineIntakePage extends StatefulWidget {
   @override
@@ -40,7 +41,7 @@ class _TrackMedicineIntakePageState extends State<TrackMedicineIntakePage> {
   Map<String, Map<String, dynamic>> patients = {
     '323032': {
       'patientName': 'Ghaidaa Azzam',
-      'phoneNumber2': '0505661234',
+      'phoneNumber2': '0532702571',
       'medicineIntake': [
         {
           'date': '2023-07-01',
@@ -274,6 +275,22 @@ class _TrackMedicineIntakePageState extends State<TrackMedicineIntakePage> {
     });
   }
 
+  Future<void> _makePhoneCall(String phoneNumber) async {
+    final Uri launchUri = Uri(
+      scheme: 'tel',
+      path: phoneNumber,
+    );
+    await launchUrl(launchUri);
+  }
+
+  Future<void> _sendSMS(String phoneNumber) async {
+    final Uri launchUri = Uri(
+      scheme: 'sms',
+      path: phoneNumber,
+    );
+    await launchUrl(launchUri);
+  }
+
   void _showEmergencyContact() {
     showDialog(
       context: context,
@@ -298,6 +315,24 @@ class _TrackMedicineIntakePageState extends State<TrackMedicineIntakePage> {
                 style: TextStyle(
                   fontSize: 18,
                   color: Colors.blueGrey[700],
+                ),
+              ),
+              SizedBox(height: 10),
+              ElevatedButton.icon(
+                onPressed: () => _makePhoneCall(emergencyContact),
+                icon: Icon(Icons.call),
+                label: Text('Call'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.green, // Correct parameter name
+                ),
+              ),
+              SizedBox(height: 10),
+              ElevatedButton.icon(
+                onPressed: () => _sendSMS(emergencyContact),
+                icon: Icon(Icons.message),
+                label: Text('Message'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue, // Correct parameter name
                 ),
               ),
             ],
@@ -455,6 +490,8 @@ class _TrackMedicineIntakePageState extends State<TrackMedicineIntakePage> {
                                   color: Colors.blueGrey[700],
                                 ),
                               ),
+                              onTap:
+                                  _showEmergencyContact, // Add onTap to show contact options
                             ),
                           ),
                         SizedBox(height: 10),

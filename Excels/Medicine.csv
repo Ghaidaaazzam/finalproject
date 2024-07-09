@@ -1,6 +1,6 @@
-﻿Medicine Name,Medicine Form,Dose Type,Capacity
-xxx,Pill (Tablet),500 mg,1 Tablet,30 Tablet
-yyy,Capsule,250 mg,1 Capsule,50 Capsule
+﻿Medicine Name,Medicine Form,Dose Type,Capacity,Image
+xxx,Pill (Tablet),500 mg,1 Tablet,30 Tablet,images/coffee.png
+yyy,Capsule,250 mg,1 Capsule,50 Capsule,images/dinner.png
 hhh,Liquid (Syrup),1 mL, 100 mL
 ggg,Injection (Shot),0.01 mL, 10mL
 eee,Inhaler,1 puff,200 puff
