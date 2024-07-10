@@ -1,5 +1,6 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
@@ -21,14 +22,19 @@ class NotificationHelper {
             (NotificationResponse response) async {
       // Handle notification tapped logic here
       print("Notification Tapped");
-      _showPopup("Time to take your medicine!");
+      if (response.payload != null) {
+        final prescriptionDocPath = response.payload!;
+        print('Payload data: prescriptionDocPath = $prescriptionDocPath');
+        _showPopup("Time to take your medicine!", prescriptionDocPath);
+      }
     });
 
     // Initialize timezone data
     tz.initializeTimeZones();
   }
 
-  Future<void> scheduleNotification(TimeOfDay time, String message) async {
+  Future<void> scheduleNotification(
+      TimeOfDay time, String message, DocumentReference prescriptionDoc) async {
     final now = DateTime.now();
     final scheduleDateTime = DateTime(
       now.year,
@@ -53,6 +59,9 @@ class NotificationHelper {
       android: androidPlatformChannelSpecifics,
     );
 
+    // Use the prescription document path as the payload
+    final payload = prescriptionDoc.path;
+
     await flutterLocalNotificationsPlugin.zonedSchedule(
       0,
       'Medicine Reminder',
@@ -63,12 +72,13 @@ class NotificationHelper {
       uiLocalNotificationDateInterpretation:
           UILocalNotificationDateInterpretation.absoluteTime,
       matchDateTimeComponents: DateTimeComponents.time,
+      payload: payload,
     );
 
-    print('Notification scheduled for $scheduleTime');
+    print('Notification scheduled for $scheduleTime with payload: $payload');
   }
 
-  void _showPopup(String message) {
+  void _showPopup(String message, String prescriptionDocPath) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -122,6 +132,8 @@ class NotificationHelper {
                         ),
                       ),
                       onPressed: () {
+                        print("I take it button pressed");
+                        _updateCapacity(prescriptionDocPath);
                         Navigator.of(context).pop();
                       },
                       child: Text(
@@ -154,5 +166,33 @@ class NotificationHelper {
         );
       },
     );
+  }
+
+  Future<void> _updateCapacity(String prescriptionDocPath) async {
+    try {
+      print('Updating capacity for prescriptionDocPath: $prescriptionDocPath');
+      final docRef = FirebaseFirestore.instance.doc(prescriptionDocPath);
+
+      print('Document reference path: ${docRef.path}');
+
+      final docSnapshot = await docRef.get();
+      print('Fetched document: ${docSnapshot.data()}');
+
+      if (docSnapshot.exists) {
+        final prescriptionData = docSnapshot.data() as Map<String, dynamic>;
+
+        final capacity = prescriptionData['capacity'] as int;
+        final pillsPerDose = prescriptionData['pillsPerDose'] as int;
+
+        final newCapacity = capacity - pillsPerDose;
+
+        await docRef.update({'capacity': newCapacity});
+        print('Capacity updated: $newCapacity');
+      } else {
+        print('Document does not exist');
+      }
+    } catch (e) {
+      print('Failed to update capacity: $e');
+    }
   }
 }

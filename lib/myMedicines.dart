@@ -187,9 +187,11 @@ class _MyMedicinesState extends State<MyMedicines> {
         prescriptionDoc.update({'times': times});
       });
 
-      print('Scheduling notification for $picked');
+      // Schedule the notification with prescription information
       notificationHelper.scheduleNotification(
-          picked, 'Time to take your medicine!');
+          picked, 'Time to take your medicine!', prescriptionDoc);
+
+      print('Scheduling notification for $picked');
     }
   }
 
@@ -303,6 +305,11 @@ class _MyMedicinesState extends State<MyMedicines> {
                     document.reference.update({'times': []});
                   }
 
+                  // Print capacity and pillsPerDose
+                  print('Prescription: ${prescription['medicineName']}');
+                  print('Capacity: ${prescription['capacity']}');
+                  print('Pills per Dose: ${prescription['pillsPerDose']}');
+
                   return Card(
                     color: Colors.white, // Setting the card color to white
                     margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -329,6 +336,12 @@ class _MyMedicinesState extends State<MyMedicines> {
                           ),
                           Text(
                             'Pills per Dose: ${prescription['pillsPerDose']}',
+                            style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 22), // Text color
+                          ),
+                          Text(
+                            'Capacity: ${prescription['capacity']}',
                             style: TextStyle(
                                 color: Colors.black,
                                 fontSize: 22), // Text color
