@@ -3,10 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
+import 'package:flutter/services.dart'; // Add this import for rootBundle
+import 'dart:convert'; // Add this import for LineSplitter
 
 class NotificationHelper {
   late FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
   late BuildContext context;
+  Map<String, String> medicineImages = {};
 
   NotificationHelper(BuildContext context) {
     this.context = context;
@@ -31,6 +34,21 @@ class NotificationHelper {
 
     // Initialize timezone data
     tz.initializeTimeZones();
+
+    // Load medicine images from CSV
+    _loadMedicineImages();
+  }
+
+  Future<void> _loadMedicineImages() async {
+    final data = await rootBundle.loadString('Excels/Medicine.csv');
+    final lines = LineSplitter.split(data);
+    for (var line in lines.skip(1)) {
+      final values = line.split(',');
+      if (values.isNotEmpty && values.length > 5) {
+        medicineImages[values[0]] =
+            values[5]; // Assuming image path is at index 5
+      }
+    }
   }
 
   Future<void> scheduleNotification(
@@ -78,7 +96,15 @@ class NotificationHelper {
     print('Notification scheduled for $scheduleTime with payload: $payload');
   }
 
-  void _showPopup(String message, String prescriptionDocPath) {
+  void _showPopup(String message, String prescriptionDocPath) async {
+    final docRef = FirebaseFirestore.instance.doc(prescriptionDocPath);
+    final docSnapshot = await docRef.get();
+    final prescriptionData = docSnapshot.data() as Map<String, dynamic>;
+
+    String medicineName = prescriptionData['medicineName'];
+    String imagePath = medicineImages[medicineName] ??
+        'images/Medicines.png'; // Default image if not found
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -96,7 +122,7 @@ class NotificationHelper {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Image.asset(
-                  'images/Medicines.png', // Add your medicine image asset
+                  imagePath,
                   height: 100,
                   width: 100,
                 ),
