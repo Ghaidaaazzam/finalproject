@@ -131,67 +131,88 @@ class _MedicineStockState extends State<MedicineStock> {
                 children: prescriptionsSnapshot.data!.docs.map((document) {
                   Map<String, dynamic> prescription =
                       document.data() as Map<String, dynamic>;
-                  int dailyDose = int.tryParse(prescription['dailyDose']) ?? 0;
-                  int pillsPerDose =
-                      int.tryParse(prescription['pillsPerDose']) ?? 0;
-                  int totalPills = dailyDose * pillsPerDose;
-                  DateTime startDate =
-                      DateFormat('yyyy-MM-dd').parse(prescription['startDate']);
-                  DateTime endDate =
-                      DateFormat('yyyy-MM-dd').parse(prescription['endDate']);
-                  int daysPrescribed = endDate.difference(startDate).inDays + 1;
-                  int totalNeeded = dailyDose * pillsPerDose * daysPrescribed;
 
-                  String medicineForm =
-                      medicineForms[prescription['medicineName']] ?? 'dose';
+                  // Debugging information
+                  print("Prescription Data: $prescription");
 
-                  return Card(
-                    color: Colors.white,
-                    margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Medicine: ${prescription['medicineName']}',
-                            style: TextStyle(
-                              fontSize: 28,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
+                  try {
+                    int dailyDose = prescription['dailyDose'] is int
+                        ? prescription['dailyDose']
+                        : int.parse(prescription['dailyDose'].toString());
+                    int pillsPerDose = prescription['pillsPerDose'] is int
+                        ? prescription['pillsPerDose']
+                        : int.parse(prescription['pillsPerDose'].toString());
+
+                    int totalPills = dailyDose * pillsPerDose;
+                    DateTime startDate = DateFormat('yyyy-MM-dd')
+                        .parse(prescription['startDate']);
+                    DateTime endDate =
+                        DateFormat('yyyy-MM-dd').parse(prescription['endDate']);
+                    int daysPrescribed =
+                        endDate.difference(startDate).inDays + 1;
+                    int totalNeeded = dailyDose * pillsPerDose * daysPrescribed;
+
+                    String medicineForm =
+                        medicineForms[prescription['medicineName']] ?? 'dose';
+
+                    return Card(
+                      color: Colors.white,
+                      margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Medicine: ${prescription['medicineName']}',
+                              style: TextStyle(
+                                fontSize: 28,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
                             ),
-                          ),
-                          SizedBox(height: 8),
-                          Text(
-                            'Form: ${medicineForm}',
-                            style: TextStyle(color: Colors.black, fontSize: 22),
-                          ),
-                          Text(
-                            '${_getDailyDoseLabel(medicineForm)}: ${prescription['dailyDose']}',
-                            style: TextStyle(color: Colors.black, fontSize: 22),
-                          ),
-                          Text(
-                            '${_getPillsPerDoseLabel(medicineForm)}: ${prescription['pillsPerDose']}',
-                            style: TextStyle(color: Colors.black, fontSize: 22),
-                          ),
-                          Text(
-                            'Start Date: ${prescription['startDate']}',
-                            style: TextStyle(color: Colors.black, fontSize: 22),
-                          ),
-                          Text(
-                            'End Date: ${prescription['endDate']}',
-                            style: TextStyle(color: Colors.black, fontSize: 22),
-                          ),
-                          SizedBox(height: 8),
-                          Text(
-                            'Total ${medicineForm.toLowerCase()}s Needed: $totalNeeded',
-                            style: TextStyle(color: Colors.black, fontSize: 22),
-                          ),
-                          // Add any additional information you want to display
-                        ],
+                            SizedBox(height: 8),
+                            Text(
+                              'Form: ${medicineForm}',
+                              style:
+                                  TextStyle(color: Colors.black, fontSize: 22),
+                            ),
+                            Text(
+                              '${_getDailyDoseLabel(medicineForm)}: ${dailyDose}',
+                              style:
+                                  TextStyle(color: Colors.black, fontSize: 22),
+                            ),
+                            Text(
+                              '${_getPillsPerDoseLabel(medicineForm)}: ${pillsPerDose}',
+                              style:
+                                  TextStyle(color: Colors.black, fontSize: 22),
+                            ),
+                            Text(
+                              'Start Date: ${prescription['startDate']}',
+                              style:
+                                  TextStyle(color: Colors.black, fontSize: 22),
+                            ),
+                            Text(
+                              'End Date: ${prescription['endDate']}',
+                              style:
+                                  TextStyle(color: Colors.black, fontSize: 22),
+                            ),
+                            SizedBox(height: 8),
+                            Text(
+                              'Total ${medicineForm.toLowerCase()}s Needed: $totalNeeded',
+                              style:
+                                  TextStyle(color: Colors.black, fontSize: 22),
+                            ),
+                            // Add any additional information you want to display
+                          ],
+                        ),
                       ),
-                    ),
-                  );
+                    );
+                  } catch (e) {
+                    print("Error processing prescription data: $e");
+                    return Center(
+                        child: Text('Error processing prescription data.'));
+                  }
                 }).toList(),
               );
             },
