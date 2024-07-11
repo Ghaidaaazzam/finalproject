@@ -75,6 +75,13 @@ class _MedicineStockState extends State<MedicineStock> {
     }
   }
 
+  DateTime _calculateExpectedEndDate(
+      int capacity, int dailyDose, int pillsPerDose) {
+    int totalDosesLeft = capacity ~/ pillsPerDose;
+    int daysLeft = totalDosesLeft ~/ dailyDose;
+    return DateTime.now().add(Duration(days: daysLeft));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -142,18 +149,17 @@ class _MedicineStockState extends State<MedicineStock> {
                     int pillsPerDose = prescription['pillsPerDose'] is int
                         ? prescription['pillsPerDose']
                         : int.parse(prescription['pillsPerDose'].toString());
-
-                    int totalPills = dailyDose * pillsPerDose;
-                    DateTime startDate = DateFormat('yyyy-MM-dd')
-                        .parse(prescription['startDate']);
-                    DateTime endDate =
-                        DateFormat('yyyy-MM-dd').parse(prescription['endDate']);
-                    int daysPrescribed =
-                        endDate.difference(startDate).inDays + 1;
-                    int totalNeeded = dailyDose * pillsPerDose * daysPrescribed;
+                    int capacity = prescription['capacity'] is int
+                        ? prescription['capacity']
+                        : int.parse(prescription['capacity'].toString());
 
                     String medicineForm =
                         medicineForms[prescription['medicineName']] ?? 'dose';
+
+                    DateTime expectedEndDate = _calculateExpectedEndDate(
+                        capacity, dailyDose, pillsPerDose);
+                    String formattedEndDate =
+                        DateFormat('yyyy-MM-dd').format(expectedEndDate);
 
                     return Card(
                       color: Colors.white,
@@ -178,32 +184,15 @@ class _MedicineStockState extends State<MedicineStock> {
                                   TextStyle(color: Colors.black, fontSize: 22),
                             ),
                             Text(
-                              '${_getDailyDoseLabel(medicineForm)}: ${dailyDose}',
+                              'Total pills left: ${capacity}',
                               style:
                                   TextStyle(color: Colors.black, fontSize: 22),
                             ),
                             Text(
-                              '${_getPillsPerDoseLabel(medicineForm)}: ${pillsPerDose}',
+                              'Expected End Date: ${formattedEndDate}',
                               style:
                                   TextStyle(color: Colors.black, fontSize: 22),
                             ),
-                            Text(
-                              'Start Date: ${prescription['startDate']}',
-                              style:
-                                  TextStyle(color: Colors.black, fontSize: 22),
-                            ),
-                            Text(
-                              'End Date: ${prescription['endDate']}',
-                              style:
-                                  TextStyle(color: Colors.black, fontSize: 22),
-                            ),
-                            SizedBox(height: 8),
-                            Text(
-                              'Total ${medicineForm.toLowerCase()}s Needed: $totalNeeded',
-                              style:
-                                  TextStyle(color: Colors.black, fontSize: 22),
-                            ),
-                            // Add any additional information you want to display
                           ],
                         ),
                       ),
