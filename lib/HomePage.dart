@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'MyMedicines.dart';
 import 'UserProfile.dart';
+import 'TakeORMiss.dart';
 
 class HomePage extends StatefulWidget {
   final String userId;
@@ -51,8 +52,12 @@ class _HomePageState extends State<HomePage> {
         );
         break;
       case 3:
-        // Do nothing for Statistics icon
-        break;
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) =>
+                  MedicineIntakePage(patientId: widget.userId)),
+        );
     }
   }
 

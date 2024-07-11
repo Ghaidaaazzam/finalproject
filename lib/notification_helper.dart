@@ -159,7 +159,8 @@ class NotificationHelper {
                       ),
                       onPressed: () {
                         print("I take it button pressed");
-                        _updateCapacity(prescriptionDocPath);
+                        _updateIntakeStatus(
+                            prescriptionDocPath, true); // Mark as taken
                         Navigator.of(context).pop();
                       },
                       child: Text(
@@ -176,8 +177,10 @@ class NotificationHelper {
                         ),
                       ),
                       onPressed: () {
+                        print("Remind me later button pressed");
+                        _updateIntakeStatus(
+                            prescriptionDocPath, false); // Mark as missed
                         Navigator.of(context).pop();
-                        // Add logic to reschedule the notification
                       },
                       child: Text(
                         'Remind me later',
@@ -194,9 +197,11 @@ class NotificationHelper {
     );
   }
 
-  Future<void> _updateCapacity(String prescriptionDocPath) async {
+  Future<void> _updateIntakeStatus(
+      String prescriptionDocPath, bool taken) async {
     try {
-      print('Updating capacity for prescriptionDocPath: $prescriptionDocPath');
+      print(
+          'Updating intake status for prescriptionDocPath: $prescriptionDocPath');
       final docRef = FirebaseFirestore.instance.doc(prescriptionDocPath);
 
       print('Document reference path: ${docRef.path}');
@@ -206,19 +211,37 @@ class NotificationHelper {
 
       if (docSnapshot.exists) {
         final prescriptionData = docSnapshot.data() as Map<String, dynamic>;
+        final medicineName = prescriptionData['medicineName'];
 
-        final capacity = prescriptionData['capacity'] as int;
-        final pillsPerDose = prescriptionData['pillsPerDose'] as int;
+        // Create or update the daily record
+        final now = DateTime.now();
+        final dateId =
+            '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
+        final dailyDocRef = docRef.collection('medicines').doc(dateId);
 
-        final newCapacity = capacity - pillsPerDose;
+        await dailyDocRef.set({
+          'date': now,
+        }, SetOptions(merge: true));
 
-        await docRef.update({'capacity': newCapacity});
-        print('Capacity updated: $newCapacity');
+        await dailyDocRef.collection('takeOrMiss').add({
+          'medicineName': medicineName,
+          'taken': taken,
+        });
+
+        // Update capacity if the medicine was taken
+        if (taken) {
+          final capacity = prescriptionData['capacity'] as int;
+          final pillsPerDose = prescriptionData['pillsPerDose'] as int;
+          final newCapacity = capacity - pillsPerDose;
+
+          await docRef.update({'capacity': newCapacity});
+          print('Capacity updated: $newCapacity');
+        }
       } else {
         print('Document does not exist');
       }
     } catch (e) {
-      print('Failed to update capacity: $e');
+      print('Failed to update intake status: $e');
     }
   }
 }

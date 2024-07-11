@@ -6,6 +6,8 @@ import 'ResetPassword.dart'; // Import the ResetPassword
 import 'MyMedicines.dart'; // Import MyMedicines page
 import 'LoginPage.dart'; // Import the LoginPage
 import 'HelpPage.dart'; // Import the HelpPage
+import 'HomePage.dart'; // Import HomePage
+import 'TakeORMiss.dart'; // Import the new MedicineIntakePage
 
 class UserProfile extends StatefulWidget {
   final String userId;
@@ -55,12 +57,14 @@ class _UserProfileState extends State<UserProfile> {
 
   void _onItemTapped(int index) {
     switch (index) {
-      case 1:
+      case 0:
         Navigator.push(
           context,
           MaterialPageRoute(
-              builder: (context) => UserProfile(userId: widget.userId)),
+              builder: (context) => HomePage(userId: widget.userId)),
         );
+        break;
+      case 1:
         break;
       case 2:
         Navigator.push(
@@ -70,7 +74,12 @@ class _UserProfileState extends State<UserProfile> {
         );
         break;
       case 3:
-        // Do nothing for Statistics icon
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) =>
+                  MedicineIntakePage(patientId: widget.userId)),
+        );
         break;
     }
   }
@@ -130,7 +139,7 @@ class _UserProfileState extends State<UserProfile> {
     return Scaffold(
       backgroundColor: Color.fromARGB(255, 217, 242, 255),
       appBar: AppBar(
-        backgroundColor: Color(0xFFA8DADC),
+        backgroundColor: Color.fromARGB(255, 217, 242, 255),
         elevation: 0,
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.black),

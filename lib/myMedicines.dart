@@ -1,90 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'UserProfile.dart'; // Import UserProfile
-import 'EditProfilePage.dart'; // Import EditProfilePage
-import 'MedicineStock.dart'; // Import MedicineStock
-import 'package:timezone/data/latest.dart' as tz;
-import 'package:timezone/timezone.dart' as tz;
-import 'dart:async';
-import 'notification_helper.dart'; // Import NotificationHelper
-
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  tz.initializeTimeZones();
-  await _configureLocalTimeZone();
-
-  runApp(MyApp());
-}
-
-Future<void> _configureLocalTimeZone() async {
-  tz.initializeTimeZones();
-  final String timeZoneName = await tz.getLocation('Europe/London').name;
-  tz.setLocalLocation(tz.getLocation(timeZoneName));
-}
-
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      localizationsDelegates: [
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: [
-        const Locale('en', 'US'), // English (US)
-        const Locale('en', 'GB'), // English (UK)
-      ],
-      locale: const Locale(
-          'en', 'GB'), // Set the locale to UK English for 24-hour format
-      theme: ThemeData(
-        colorScheme: ColorScheme.light(
-          primary: Color(0xFFA8DADC), // Pastel Blue
-          secondary: Color(0xFFFF9DC6), // Pastel Pink
-          background: Color.fromARGB(255, 217, 242, 255), // White
-          surface: Color.fromARGB(255, 175, 227, 252), // Pastel Bright Blue
-          onPrimary: Color(0xFFFFFFFF), // White
-          onSecondary: Color.fromARGB(255, 0, 0, 0), // Black
-          onBackground: Color(0xFFB0BEC5), // Light Gray
-          onSurface: Color(0xFFB0BEC5), // Light Gray
-        ),
-        textTheme: TextTheme(
-          displayLarge: TextStyle(color: Color(0xFF000000)), // Black
-          bodyLarge: TextStyle(color: Color(0xFF000000)), // Black
-        ),
-        timePickerTheme: TimePickerThemeData(
-          backgroundColor: Color(0xFFF8E1E9), // Light pastel pink
-          hourMinuteTextColor: Colors.black,
-          hourMinuteColor: Color(0xFFF06292), // Slightly darker pastel pink
-          dialHandColor: Color(0xFFF06292),
-          dialBackgroundColor: Colors.white,
-          entryModeIconColor: Color(0xFFF06292),
-          helpTextStyle: TextStyle(
-            color: Colors.black,
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
-          hourMinuteTextStyle: TextStyle(
-            color: Colors.black,
-            fontSize: 32,
-            fontWeight: FontWeight.bold,
-          ),
-          dialTextColor: MaterialStateColor.resolveWith((states) =>
-              states.contains(MaterialState.selected)
-                  ? Colors.white
-                  : Colors.black),
-          inputDecorationTheme: InputDecorationTheme(
-            focusedBorder: UnderlineInputBorder(
-              borderSide: BorderSide(color: Color(0xFFF06292)),
-            ),
-          ),
-        ),
-      ),
-      home: MyMedicines(userId: 'user123'),
-    );
-  }
-}
+import 'TakeORMiss.dart'; // Import MedicineIntakePage
+import 'HomePage.dart'; // Import HomePage
+import 'MyMedicines.dart';
 
 class MyMedicines extends StatefulWidget {
   final String userId;
@@ -96,25 +15,17 @@ class MyMedicines extends StatefulWidget {
 }
 
 class _MyMedicinesState extends State<MyMedicines> {
-  late NotificationHelper notificationHelper;
   int _selectedIndex = 2;
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    notificationHelper = NotificationHelper(context);
-  }
-
-  void _navigateToMedicineStock() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-          builder: (context) => MedicineStock(userId: widget.userId)),
-    );
-  }
 
   void _onItemTapped(int index) {
     switch (index) {
+      case 0:
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => HomePage(userId: widget.userId)),
+        );
+        break;
       case 1:
         Navigator.push(
           context,
@@ -123,15 +34,15 @@ class _MyMedicinesState extends State<MyMedicines> {
         );
         break;
       case 2:
-        // Navigate to the MedicineStock page
+        // Stay on current page
+        break;
+      case 3:
         Navigator.push(
           context,
           MaterialPageRoute(
-              builder: (context) => MedicineStock(userId: widget.userId)),
+              builder: (context) =>
+                  MedicineIntakePage(patientId: widget.userId)),
         );
-        break;
-      case 3:
-        // Do nothing for Statistics icon
         break;
     }
   }
@@ -188,8 +99,8 @@ class _MyMedicinesState extends State<MyMedicines> {
       });
 
       // Schedule the notification with prescription information
-      notificationHelper.scheduleNotification(
-          picked, 'Time to take your medicine!', prescriptionDoc);
+      // notificationHelper.scheduleNotification(
+      //     picked, 'Time to take your medicine!', prescriptionDoc);
 
       print('Scheduling notification for $picked');
     }
@@ -199,55 +110,12 @@ class _MyMedicinesState extends State<MyMedicines> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('My Medicines'),
+        title: Text(
+          'My Medicines',
+          style: TextStyle(color: Colors.black),
+        ),
         backgroundColor: Color.fromARGB(255, 217, 242, 255),
         iconTheme: IconThemeData(color: Colors.black),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Material(
-              color: Colors.transparent,
-              child: InkWell(
-                onTap: _navigateToMedicineStock,
-                borderRadius: BorderRadius.circular(30.0),
-                child: Ink(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        Color.fromARGB(255, 244, 167, 193),
-                        Color(0xFFF06292),
-                      ],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      stops: [0.1, 1.0],
-                    ),
-                    borderRadius: BorderRadius.circular(30.0),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black26,
-                        offset: Offset(0, 4),
-                        blurRadius: 4.0,
-                        spreadRadius: 1.0,
-                      ),
-                    ],
-                  ),
-                  padding: EdgeInsets.symmetric(
-                      horizontal: 8, vertical: 8), // Adjusted padding
-                  child: Center(
-                    child: Text(
-                      'My Medicines Stock',
-                      style: TextStyle(
-                        fontSize: 14, // Adjusted font size
-                        color: Colors.black,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
       ),
       backgroundColor: Color.fromARGB(255, 217, 242, 255),
       body: StreamBuilder<QuerySnapshot>(
