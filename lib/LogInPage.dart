@@ -3,7 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'firebase_options.dart';
 import 'forgetPassword.dart';
-import 'myMedicines.dart'; // Import the MyMedicines page
+import 'Homepage.dart'; // Import the HomePage
 import 'survey.dart'; // Import the Survey page
 
 void main() async {
@@ -81,7 +81,8 @@ class _LoginPageState extends State<LoginPage> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => MyMedicines(userId: enteredId),
+              builder: (context) =>
+                  HomePage(userId: enteredId), // Navigate to HomePage
             ),
           );
         } else {
@@ -227,8 +228,8 @@ class _LoginPageState extends State<LoginPage> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => ForgotPassword(
-                            userId: _idController.text), // Add userId here
+                        builder: (context) =>
+                            ForgotPassword(userId: _idController.text),
                       ),
                     );
                   },
