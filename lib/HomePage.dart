@@ -61,14 +61,15 @@ class _HomePageState extends State<HomePage> {
     final lines = LineSplitter.split(data);
     for (var line in lines.skip(1)) {
       final values = line.split(',');
-      if (values.isNotEmpty && values.length > 6) {
+      if (values.isNotEmpty && values.length > 7) {
         medicineDetails[values[0]] = {
           'form': values[1],
-          'doseType': values[2],
-          'capacity': values[3],
-          'image': values[4],
-          'warning': values[5],
-          'sideEffect': values[6],
+          'unit': values[2],
+          'doseType': values[3],
+          'capacity': values[4],
+          'image': values[5],
+          'warning': values[6],
+          'sideEffect': values[7],
         };
       }
     }
@@ -335,11 +336,6 @@ class _HomePageState extends State<HomePage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Icon(Icons.home, size: 40, color: Colors.white),
-                    Text(
-                      'Welcome!',
-                      style: TextStyle(fontSize: 24, color: Colors.white),
-                    ),
                     Image.asset('images/Medicines.png', width: 40, height: 40),
                   ],
                 ),
