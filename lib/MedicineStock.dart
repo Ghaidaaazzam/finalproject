@@ -15,30 +15,34 @@ class MedicineStock extends StatefulWidget {
 
 class _MedicineStockState extends State<MedicineStock> {
   List<String> medicineNames = [];
-  Map<String, String> medicineForms = {};
+  Map<String, Map<String, String>> medicineDetails = {};
   String medicineForm = '';
 
   @override
   void initState() {
     super.initState();
-    _loadMedicineForms();
+    _loadMedicineDetails();
   }
 
-  void _loadMedicineForms() async {
+  void _loadMedicineDetails() async {
     final data = await rootBundle.loadString('Excels/Medicine.csv');
     final lines = LineSplitter.split(data);
-    for (var line in lines) {
+    for (var line in lines.skip(1)) {
       final values = line.split(',');
-      if (values.isNotEmpty) {
-        medicineNames
-            .add(values[0]); // Assuming the first column is the medicine name
-        if (values.length > 1) {
-          medicineForms[values[0]] =
-              values[1]; // Assuming the second column is the medicine form
-        }
+      if (values.isNotEmpty && values.length > 7) {
+        medicineDetails[values[0]] = {
+          'form': values[1],
+          'unit': values[2],
+          'doseType': values[3],
+          'capacity': values[4],
+          'image': values[5],
+          'warning': values[6],
+          'sideEffect': values[7],
+        };
       }
     }
     setState(() {});
+    print("Medicine details loaded: $medicineDetails"); // Debug print
   }
 
   String _getDailyDoseLabel(String medicineForm) {
@@ -80,6 +84,43 @@ class _MedicineStockState extends State<MedicineStock> {
     int totalDosesLeft = capacity ~/ pillsPerDose;
     int daysLeft = totalDosesLeft ~/ dailyDose;
     return DateTime.now().add(Duration(days: daysLeft));
+  }
+
+  void _showEnlargedImage(String imagePath) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Image.asset(imagePath, fit: BoxFit.contain),
+              SizedBox(height: 10),
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text(
+                  'Close',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                  ),
+                ),
+                style: TextButton.styleFrom(
+                  backgroundColor: Colors.black54,
+                  padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -154,7 +195,13 @@ class _MedicineStockState extends State<MedicineStock> {
                         : int.parse(prescription['capacity'].toString());
 
                     String medicineForm =
-                        medicineForms[prescription['medicineName']] ?? 'dose';
+                        medicineDetails[prescription['medicineName']]
+                                ?['form'] ??
+                            'dose';
+                    String imagePath =
+                        medicineDetails[prescription['medicineName']]
+                                ?['image'] ??
+                            '';
 
                     DateTime expectedEndDate = _calculateExpectedEndDate(
                         capacity, dailyDose, pillsPerDose);
@@ -169,6 +216,19 @@ class _MedicineStockState extends State<MedicineStock> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+                            GestureDetector(
+                              onTap: () => _showEnlargedImage(imagePath),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(15),
+                                child: Image.asset(
+                                  imagePath,
+                                  width: double.infinity,
+                                  height: 150,
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                            ),
+                            SizedBox(height: 8),
                             Text(
                               'Medicine: ${prescription['medicineName']}',
                               style: TextStyle(
@@ -179,17 +239,17 @@ class _MedicineStockState extends State<MedicineStock> {
                             ),
                             SizedBox(height: 8),
                             Text(
-                              'Form: ${medicineForm}',
+                              'Form: $medicineForm',
                               style:
                                   TextStyle(color: Colors.black, fontSize: 22),
                             ),
                             Text(
-                              'Total pills left: ${capacity}',
+                              'Total pills left: $capacity',
                               style:
                                   TextStyle(color: Colors.black, fontSize: 22),
                             ),
                             Text(
-                              'Expected End Date: ${formattedEndDate}',
+                              'Expected End Date: $formattedEndDate',
                               style:
                                   TextStyle(color: Colors.black, fontSize: 22),
                             ),
