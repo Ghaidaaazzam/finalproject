@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:finalproject/firebase_options.dart';
 import 'prescription.dart';
 import 'AddPatient.dart';
@@ -24,7 +25,6 @@ class MyApp extends StatelessWidget {
         '/prescription': (context) => PrescriptionPage(),
         '/doctorHome': (context) => DoctorHomePage(),
         '/addPatient': (context) => AddPatientPage(),
-        //'/editProfile': (context) => EditProfilePage(),
         '/trackMedicineIntake': (context) => TrackMedicineIntakePage(),
       },
     );
@@ -40,49 +40,6 @@ class _DoctorHomePageState extends State<DoctorHomePage> {
   int _selectedIndex = 0;
   String idFilter = '';
   int? daysLeftFilter;
-
-  List<Map<String, dynamic>> prescriptions = [
-    {
-      'patientName': 'John Doe',
-      'patientId': '123456789',
-      'medicineName': 'Medicine A',
-      'dailyDose': '2',
-      'pillsPerDose': '1',
-      'startDate': DateTime.now().subtract(Duration(days: 10)),
-      'endDate': DateTime.now().add(Duration(days: 2)),
-      'doctorNotice': 'Take with food',
-    },
-    {
-      'patientName': 'Jane Smith',
-      'patientId': '987654321',
-      'medicineName': 'Medicine B',
-      'dailyDose': '1',
-      'pillsPerDose': '1',
-      'startDate': DateTime.now().subtract(Duration(days: 20)),
-      'endDate': DateTime.now().add(Duration(days: 4)),
-      'doctorNotice': 'Take before bed',
-    },
-    {
-      'patientName': 'Mike Johnson',
-      'patientId': '112233445',
-      'medicineName': 'Medicine C',
-      'dailyDose': '3',
-      'pillsPerDose': '1',
-      'startDate': DateTime.now().subtract(Duration(days: 5)),
-      'endDate': DateTime.now().add(Duration(days: 1)),
-      'doctorNotice': 'Avoid alcohol',
-    },
-    {
-      'patientName': 'Emily Davis',
-      'patientId': '998877665',
-      'medicineName': 'Medicine D',
-      'dailyDose': '2',
-      'pillsPerDose': '2',
-      'startDate': DateTime.now().subtract(Duration(days: 15)),
-      'endDate': DateTime.now().add(Duration(days: 5)),
-      'doctorNotice': 'Take with water',
-    },
-  ];
 
   void _onItemTapped(int index) {
     setState(() {
@@ -104,16 +61,65 @@ class _DoctorHomePageState extends State<DoctorHomePage> {
     }
   }
 
+  DateTime _calculateExpectedEndDate(
+      int capacity, int dailyDose, int pillsPerDose) {
+    int totalDosesLeft = capacity ~/ pillsPerDose;
+    int daysLeft = totalDosesLeft ~/ dailyDose;
+    return DateTime.now().add(Duration(days: daysLeft));
+  }
+
+  Future<List<Map<String, dynamic>>> _fetchAllPrescriptions() async {
+    List<Map<String, dynamic>> allPrescriptions = [];
+
+    QuerySnapshot patientsSnapshot =
+        await FirebaseFirestore.instance.collection('patients').get();
+    for (var patientDoc in patientsSnapshot.docs) {
+      final patientData = patientDoc.data() as Map<String, dynamic>;
+      final patientName = patientData['FullName'];
+      final patientId = patientData['ID'];
+
+      QuerySnapshot prescriptionsSnapshot = await FirebaseFirestore.instance
+          .collection('patients')
+          .doc(patientDoc.id)
+          .collection('prescriptions')
+          .get();
+
+      for (var prescriptionDoc in prescriptionsSnapshot.docs) {
+        final prescriptionData = prescriptionDoc.data() as Map<String, dynamic>;
+
+        int capacity = prescriptionData['capacity'] is int
+            ? prescriptionData['capacity']
+            : int.parse(prescriptionData['capacity'].toString());
+        int dailyDose = prescriptionData['dailyDose'] is int
+            ? prescriptionData['dailyDose']
+            : int.parse(prescriptionData['dailyDose'].toString());
+        int pillsPerDose = prescriptionData['pillsPerDose'] is int
+            ? prescriptionData['pillsPerDose']
+            : int.parse(prescriptionData['pillsPerDose'].toString());
+
+        DateTime expectedEndDate =
+            _calculateExpectedEndDate(capacity, dailyDose, pillsPerDose);
+        int daysLeft = expectedEndDate.difference(DateTime.now()).inDays;
+
+        if (daysLeft <= 7) {
+          allPrescriptions.add({
+            'patientName': patientName,
+            'patientId': patientId,
+            'medicineName': prescriptionData['medicineName'],
+            'expectedEndDate': expectedEndDate,
+            'daysLeft': daysLeft,
+            'isUrgent': daysLeft <= 2,
+          });
+        }
+      }
+    }
+
+    return allPrescriptions;
+  }
+
   @override
   Widget build(BuildContext context) {
     DateFormat dateFormat = DateFormat('yyyy-MM-dd');
-    List<Map<String, dynamic>> filteredPrescriptions =
-        prescriptions.where((prescription) {
-      int daysLeft = prescription['endDate'].difference(DateTime.now()).inDays;
-      return (idFilter.isEmpty ||
-              prescription['patientId'].contains(idFilter)) &&
-          (daysLeftFilter == null || daysLeft <= daysLeftFilter!);
-    }).toList();
 
     return Scaffold(
       backgroundColor: Color.fromARGB(255, 217, 242, 255),
@@ -124,10 +130,7 @@ class _DoctorHomePageState extends State<DoctorHomePage> {
           IconButton(
             icon: Icon(Icons.refresh),
             onPressed: () {
-              setState(() {
-                // אפשרות לרענן את הנתונים
-                // כרגע זה לא מבצע פעולה אמיתית כיוון שהנתונים ידניים
-              });
+              setState(() {});
             },
           ),
           IconButton(
@@ -188,58 +191,87 @@ class _DoctorHomePageState extends State<DoctorHomePage> {
             ),
             SizedBox(height: 16),
             Expanded(
-              child: ListView.builder(
-                itemCount: filteredPrescriptions.length,
-                itemBuilder: (context, index) {
-                  var prescription = filteredPrescriptions[index];
-                  int daysLeft = prescription['endDate']
-                          .difference(DateTime.now())
-                          .inDays +
-                      1;
-                  bool isUrgent = daysLeft <= 2;
-                  return Card(
-                    color: isUrgent ? Colors.red[50] : Colors.white,
-                    margin: EdgeInsets.symmetric(vertical: 8),
-                    child: ListTile(
-                      leading: isUrgent
-                          ? Icon(Icons.warning, color: Colors.red)
-                          : null,
-                      title: Text(
-                        '${prescription['patientName']} (ID: ${prescription['patientId']})',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.blueGrey[900],
+              child: FutureBuilder<List<Map<String, dynamic>>>(
+                future: _fetchAllPrescriptions(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Center(child: CircularProgressIndicator());
+                  }
+
+                  if (snapshot.hasError) {
+                    return Center(child: Text('Something went wrong'));
+                  }
+
+                  if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return Center(child: Text('No prescriptions found'));
+                  }
+
+                  List<Map<String, dynamic>> filteredPrescriptions =
+                      snapshot.data!.where((prescription) {
+                    return (idFilter.isEmpty ||
+                            prescription['patientId'].contains(idFilter)) &&
+                        (daysLeftFilter == null ||
+                            prescription['daysLeft'] <= daysLeftFilter!);
+                  }).toList();
+
+                  return ListView.builder(
+                    itemCount: filteredPrescriptions.length,
+                    itemBuilder: (context, index) {
+                      var prescription = filteredPrescriptions[index];
+                      bool isUrgent = prescription['isUrgent'];
+                      return Card(
+                        color: isUrgent ? Colors.red[50] : Colors.white,
+                        margin: EdgeInsets.symmetric(vertical: 8),
+                        child: ListTile(
+                          leading: isUrgent
+                              ? Icon(Icons.warning, color: Colors.red)
+                              : null,
+                          title: Text(
+                            '${prescription['patientName']} (ID: ${prescription['patientId']})',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.blueGrey[900],
+                            ),
+                          ),
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                prescription['medicineName'],
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.blueGrey[700],
+                                ),
+                              ),
+                              Text(
+                                'Ends on: ${dateFormat.format(prescription['expectedEndDate'])}',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.blueGrey[700],
+                                ),
+                              ),
+                              Text(
+                                'Days left: ${prescription['daysLeft']}',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: isUrgent
+                                      ? Colors.red
+                                      : Colors.blueGrey[700],
+                                  fontWeight: isUrgent
+                                      ? FontWeight.bold
+                                      : FontWeight.normal,
+                                ),
+                              ),
+                            ],
+                          ),
+                          trailing: IconButton(
+                            icon: Icon(Icons.edit),
+                            onPressed: () => _renewPrescription(prescription),
+                          ),
                         ),
-                      ),
-                      subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            '${prescription['medicineName']} - Ends on: ${dateFormat.format(prescription['endDate'])}',
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.blueGrey[700],
-                            ),
-                          ),
-                          Text(
-                            'Days left: $daysLeft',
-                            style: TextStyle(
-                              fontSize: 16,
-                              color:
-                                  isUrgent ? Colors.red : Colors.blueGrey[700],
-                              fontWeight: isUrgent
-                                  ? FontWeight.bold
-                                  : FontWeight.normal,
-                            ),
-                          ),
-                        ],
-                      ),
-                      trailing: IconButton(
-                        icon: Icon(Icons.edit),
-                        onPressed: () => _renewPrescription(prescription),
-                      ),
-                    ),
+                      );
+                    },
                   );
                 },
               ),
@@ -332,11 +364,11 @@ class _DoctorHomePageState extends State<DoctorHomePage> {
 
   void _renewPrescription(Map<String, dynamic> prescription) {
     TextEditingController dailyDoseController =
-        TextEditingController(text: prescription['dailyDose']);
+        TextEditingController(text: prescription['dailyDose'].toString());
     TextEditingController pillsPerDoseController =
-        TextEditingController(text: prescription['pillsPerDose']);
+        TextEditingController(text: prescription['pillsPerDose'].toString());
     TextEditingController doctorNoticeController =
-        TextEditingController(text: prescription['doctorNotice']);
+        TextEditingController(text: prescription['doctorNotice'] ?? '');
     TextEditingController startDateController = TextEditingController(
         text: DateFormat('yyyy-MM-dd').format(prescription['startDate']));
     TextEditingController endDateController = TextEditingController(
