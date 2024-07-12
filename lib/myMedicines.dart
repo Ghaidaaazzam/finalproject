@@ -5,6 +5,7 @@ import 'TakeORMiss.dart'; // Import MedicineIntakePage
 import 'HomePage.dart'; // Import HomePage
 import 'MyMedicines.dart';
 import 'notification_helper.dart'; // Import NotificationHelper
+import 'MedicineStock.dart'; // Import MedicineStock
 
 class MyMedicines extends StatefulWidget {
   final String userId;
@@ -114,6 +115,14 @@ class _MyMedicinesState extends State<MyMedicines> {
     }
   }
 
+  void _navigateToMedicineStock() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+          builder: (context) => MedicineStock(userId: widget.userId)),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -124,6 +133,52 @@ class _MyMedicinesState extends State<MyMedicines> {
         ),
         backgroundColor: Color.fromARGB(255, 217, 242, 255),
         iconTheme: IconThemeData(color: Colors.black),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: _navigateToMedicineStock,
+                borderRadius: BorderRadius.circular(30.0),
+                child: Ink(
+                  height: 40, // Add this line to set a specific height
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        Color.fromARGB(255, 244, 167, 193),
+                        Color(0xFFF06292),
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      stops: [0.1, 1.0],
+                    ),
+                    borderRadius: BorderRadius.circular(30.0),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black26,
+                        offset: Offset(0, 4),
+                        blurRadius: 4.0,
+                        spreadRadius: 1.0,
+                      ),
+                    ],
+                  ),
+                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 1),
+                  child: Center(
+                    child: Text(
+                      'Medicines Stock',
+                      style: TextStyle(
+                        fontSize: 18,
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
       backgroundColor: Color.fromARGB(255, 217, 242, 255),
       body: StreamBuilder<QuerySnapshot>(
