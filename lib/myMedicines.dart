@@ -95,6 +95,7 @@ class _MyMedicinesState extends State<MyMedicines> {
         );
       },
     );
+
     if (picked != null) {
       setState(() {
         final timeString =
@@ -104,7 +105,11 @@ class _MyMedicinesState extends State<MyMedicines> {
         } else {
           times[index] = timeString;
         }
-        prescriptionDoc.update({'times': times});
+        prescriptionDoc.update({'times': times}).then((_) {
+          print('Times updated successfully');
+        }).catchError((error) {
+          print('Failed to update times: $error');
+        });
       });
 
       // Schedule the notification with prescription information
