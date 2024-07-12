@@ -4,6 +4,7 @@ import 'UserProfile.dart'; // Import UserProfile
 import 'TakeORMiss.dart'; // Import MedicineIntakePage
 import 'HomePage.dart'; // Import HomePage
 import 'MyMedicines.dart';
+import 'notification_helper.dart'; // Import NotificationHelper
 
 class MyMedicines extends StatefulWidget {
   final String userId;
@@ -16,6 +17,13 @@ class MyMedicines extends StatefulWidget {
 
 class _MyMedicinesState extends State<MyMedicines> {
   int _selectedIndex = 2;
+  late NotificationHelper notificationHelper;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    notificationHelper = NotificationHelper(context);
+  }
 
   void _onItemTapped(int index) {
     switch (index) {
@@ -99,8 +107,8 @@ class _MyMedicinesState extends State<MyMedicines> {
       });
 
       // Schedule the notification with prescription information
-      // notificationHelper.scheduleNotification(
-      //     picked, 'Time to take your medicine!', prescriptionDoc);
+      notificationHelper.scheduleNotification(
+          picked, 'Time to take your medicine!', prescriptionDoc);
 
       print('Scheduling notification for $picked');
     }
@@ -172,11 +180,6 @@ class _MyMedicinesState extends State<MyMedicines> {
                   if (times.isEmpty) {
                     document.reference.update({'times': []});
                   }
-
-                  // Print capacity and pillsPerDose
-                  print('Prescription: ${prescription['medicineName']}');
-                  print('Capacity: ${prescription['capacity']}');
-                  print('Pills per Dose: ${prescription['pillsPerDose']}');
 
                   return Card(
                     color: Colors.white, // Setting the card color to white

@@ -177,10 +177,10 @@ class NotificationHelper {
                         ),
                       ),
                       onPressed: () {
-                        print("Remind me later button pressed");
                         _updateIntakeStatus(
                             prescriptionDocPath, false); // Mark as missed
                         Navigator.of(context).pop();
+                        // Add logic to reschedule the notification
                       },
                       child: Text(
                         'Remind me later',
@@ -223,10 +223,12 @@ class NotificationHelper {
           'date': now,
         }, SetOptions(merge: true));
 
-        await dailyDocRef.collection('takeOrMiss').add({
+        final takeOrMissDocRef =
+            dailyDocRef.collection('takeOrMiss').doc(medicineName);
+        await takeOrMissDocRef.set({
           'medicineName': medicineName,
           'taken': taken,
-        });
+        }, SetOptions(merge: true));
 
         // Update capacity if the medicine was taken
         if (taken) {
