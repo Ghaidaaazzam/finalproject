@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:url_launcher/url_launcher.dart'; // Import the url_launcher package
+import 'package:intl/intl.dart'; // Import the intl package
 
 class TrackMedicineIntakePage extends StatefulWidget {
   @override
@@ -37,122 +38,86 @@ class _TrackMedicineIntakePageState extends State<TrackMedicineIntakePage> {
     }
   }
 
-  // Dummy data for patients
-  Map<String, Map<String, dynamic>> patients = {
-    '323032': {
-      'patientName': 'Ghaidaa Azzam',
-      'phoneNumber2': '0532702571',
-      'medicineIntake': [
-        {
-          'date': '2023-07-01',
-          'medicine': 'Medicine A',
-          'taken': 2,
-          'missed': 1
-        },
-        {
-          'date': '2023-07-02',
-          'medicine': 'Medicine A',
-          'taken': 3,
-          'missed': 0
-        },
-        {
-          'date': '2023-07-03',
-          'medicine': 'Medicine A',
-          'taken': 2,
-          'missed': 1
-        },
-        {
-          'date': '2023-07-04',
-          'medicine': 'Medicine A',
-          'taken': 3,
-          'missed': 0
-        },
-        {
-          'date': '2023-07-05',
-          'medicine': 'Medicine A',
-          'taken': 1,
-          'missed': 2
-        },
-      ],
-    },
-    '987654321': {
-      'patientName': 'Mohamad Zoabi',
-      'phoneNumber2': '0505665678',
-      'medicineIntake': [
-        {
-          'date': '2023-07-01',
-          'medicine': 'Medicine B',
-          'taken': 1,
-          'missed': 2
-        },
-        {
-          'date': '2023-07-02',
-          'medicine': 'Medicine B',
-          'taken': 2,
-          'missed': 1
-        },
-        {
-          'date': '2023-07-03',
-          'medicine': 'Medicine B',
-          'taken': 3,
-          'missed': 0
-        },
-        {
-          'date': '2023-07-04',
-          'medicine': 'Medicine B',
-          'taken': 1,
-          'missed': 2
-        },
-        {
-          'date': '2023-07-05',
-          'medicine': 'Medicine B',
-          'taken': 2,
-          'missed': 1
-        },
-      ],
-    },
-    '123456789': {
-      'patientName': 'Yomna Zoabi',
-      'phoneNumber2': '0505669999',
-      'medicineIntake': [
-        {
-          'date': '2023-07-01',
-          'medicine': 'Medicine C',
-          'taken': 0,
-          'missed': 3
-        },
-        {
-          'date': '2023-07-02',
-          'medicine': 'Medicine C',
-          'taken': 1,
-          'missed': 2
-        },
-        {
-          'date': '2023-07-03',
-          'medicine': 'Medicine C',
-          'taken': 2,
-          'missed': 1
-        },
-        {
-          'date': '2023-07-04',
-          'medicine': 'Medicine C',
-          'taken': 3,
-          'missed': 0
-        },
-        {
-          'date': '2023-07-05',
-          'medicine': 'Medicine C',
-          'taken': 1,
-          'missed': 2
-        },
-      ],
-    },
-  };
+  Future<void> fetchPatientData(String patientId) async {
+    try {
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('patients')
+          .where('ID', isEqualTo: patientId)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        DocumentSnapshot userDoc = querySnapshot.docs.first;
+        Map<String, dynamic>? data = userDoc.data() as Map<String, dynamic>?;
+
+        String emergencyContact = data?['phoneNumber2'] ?? '';
+        List<Map<String, dynamic>> medicineIntake = [];
+
+        QuerySnapshot prescriptionsSnapshot =
+            await userDoc.reference.collection('prescriptions').get();
+        for (var doc in prescriptionsSnapshot.docs) {
+          var prescriptionData = doc.data() as Map<String, dynamic>?;
+          String medicineName =
+              prescriptionData?['medicineName'] ?? 'Unknown Medicine';
+          int dailyDose =
+              int.tryParse(prescriptionData?['dailyDose'] ?? '1') ?? 1;
+
+          QuerySnapshot dailySnapshot =
+              await doc.reference.collection('medicines').get();
+          for (var dailyDoc in dailySnapshot.docs) {
+            var dailyData = dailyDoc.data() as Map<String, dynamic>?;
+            DateTime date = (dailyData?['date'] as Timestamp).toDate();
+
+            QuerySnapshot takeOrMissSnapshot =
+                await dailyDoc.reference.collection('takeOrMiss').get();
+
+            int takenCount = 0;
+            int missedCount = 0;
+
+            for (var takeOrMissDoc in takeOrMissSnapshot.docs) {
+              var takeOrMissData =
+                  takeOrMissDoc.data() as Map<String, dynamic>?;
+              bool taken = takeOrMissData?['taken'] ?? false;
+              if (taken) {
+                takenCount++;
+              } else {
+                missedCount++;
+              }
+            }
+
+            medicineIntake.add({
+              'date': DateFormat('yyyy-MM-dd').format(date),
+              'medicine': medicineName,
+              'dailyDose': dailyDose,
+              'taken': takenCount,
+              'missed': dailyDose - takenCount,
+            });
+          }
+        }
+
+        setState(() {
+          patientData = {
+            'patientName': data?['FullName'] ?? 'Unknown',
+            'phoneNumber2': emergencyContact,
+            'medicineIntake': medicineIntake,
+          };
+          _generateData();
+        });
+      } else {
+        setState(() {
+          patientData = {};
+          barChartData = [];
+          emergencyContact = '';
+        });
+      }
+    } catch (e) {
+      print('Error fetching patient data: $e');
+    }
+  }
 
   void _generateData() {
     List<Widget> tempList = [];
-    for (var intake in patientData['medicineIntake']) {
-      double total = intake['taken'].toDouble() + intake['missed'].toDouble();
+    for (var intake in patientData['medicineIntake'] ?? []) {
+      double total = intake['dailyDose'].toDouble();
       double takenPercentage = intake['taken'].toDouble() / total;
       double missedPercentage = intake['missed'].toDouble() / total;
 
@@ -173,7 +138,7 @@ class _TrackMedicineIntakePageState extends State<TrackMedicineIntakePage> {
                     Icon(Icons.calendar_today, color: Colors.blueGrey[900]),
                     SizedBox(width: 8),
                     Text(
-                      intake['date'],
+                      intake['date'] ?? '',
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -184,7 +149,7 @@ class _TrackMedicineIntakePageState extends State<TrackMedicineIntakePage> {
                 ),
                 SizedBox(height: 8),
                 Text(
-                  'Medicine: ${intake['medicine']}',
+                  'Medicine: ${intake['medicine'] ?? ''}',
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
@@ -222,7 +187,7 @@ class _TrackMedicineIntakePageState extends State<TrackMedicineIntakePage> {
                         Icon(Icons.check_circle, color: Colors.green, size: 18),
                         SizedBox(width: 4),
                         Text(
-                          'Taken: ${intake['taken']}',
+                          'Taken: ${intake['taken'] ?? 0}',
                           style: TextStyle(fontSize: 14, color: Colors.green),
                         ),
                       ],
@@ -232,7 +197,7 @@ class _TrackMedicineIntakePageState extends State<TrackMedicineIntakePage> {
                         Icon(Icons.cancel, color: Colors.red, size: 18),
                         SizedBox(width: 4),
                         Text(
-                          'Missed: ${intake['missed']} (${intake['missed']}/$total)',
+                          'Missed: ${intake['missed'] ?? 0} (${intake['missed'] ?? 0}/$total)',
                           style: TextStyle(fontSize: 14, color: Colors.red),
                         ),
                       ],
@@ -251,19 +216,7 @@ class _TrackMedicineIntakePageState extends State<TrackMedicineIntakePage> {
   }
 
   void _searchPatient(String patientId) {
-    if (patients.containsKey(patientId)) {
-      setState(() {
-        patientData = patients[patientId]!;
-        emergencyContact = patients[patientId]!['phoneNumber2'];
-        _generateData();
-      });
-    } else {
-      setState(() {
-        patientData = {};
-        barChartData = [];
-        emergencyContact = '';
-      });
-    }
+    fetchPatientData(patientId);
   }
 
   void _resetSearch() {
@@ -365,8 +318,11 @@ class _TrackMedicineIntakePageState extends State<TrackMedicineIntakePage> {
     return Scaffold(
       backgroundColor: Color.fromARGB(255, 217, 242, 255),
       appBar: AppBar(
-        title: Text('Track Medicine Intake'),
-        backgroundColor: Color.fromARGB(255, 244, 167, 193),
+        title: Text(
+          'Track Medicine Intake',
+          style: TextStyle(color: Colors.black),
+        ),
+        backgroundColor: Color.fromARGB(255, 217, 242, 255),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -453,7 +409,7 @@ class _TrackMedicineIntakePageState extends State<TrackMedicineIntakePage> {
                           ),
                         ),
                         Text(
-                          'Patient Name: ${patientData['patientName']}',
+                          'Patient Name: ${patientData['patientName'] ?? 'Unknown'}',
                           style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
@@ -490,8 +446,7 @@ class _TrackMedicineIntakePageState extends State<TrackMedicineIntakePage> {
                                   color: Colors.blueGrey[700],
                                 ),
                               ),
-                              onTap:
-                                  _showEmergencyContact, // Add onTap to show contact options
+                              onTap: _showEmergencyContact,
                             ),
                           ),
                         SizedBox(height: 10),
