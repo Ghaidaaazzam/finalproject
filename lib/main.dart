@@ -6,6 +6,7 @@ import 'doctorHomePage.dart';
 import 'prescription.dart';
 import 'AddPatient.dart';
 import 'TrackMedicineIntakePage.dart';
+import 'ManagePrescriptionsPage.dart'; // ייבוא העמוד החדש
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -44,6 +45,8 @@ class PillPoppinApp extends StatelessWidget {
         '/prescription': (context) => PrescriptionPage(),
         '/addPatient': (context) => AddPatientPage(),
         '/trackMedicineIntake': (context) => TrackMedicineIntakePage(),
+        '/managePrescriptions': (context) =>
+            ManagePrescriptionsPage(), // הוספת הנתיב החדש
       },
     );
   }

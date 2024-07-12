@@ -94,6 +94,9 @@ class _PrescriptionPageState extends State<PrescriptionPage> {
       case 2:
         Navigator.pushNamed(context, '/addPatient');
         break;
+      case 3:
+        Navigator.pushNamed(context, '/managePrescriptions');
+        break;
     }
   }
 
@@ -686,7 +689,7 @@ class _PrescriptionPageState extends State<PrescriptionPage> {
             icon: Stack(
               children: <Widget>[
                 Icon(
-                  Icons.person,
+                  Icons.list_alt,
                   color: Colors.black,
                   size: 40,
                 ),
@@ -701,7 +704,7 @@ class _PrescriptionPageState extends State<PrescriptionPage> {
                 ),
               ],
             ),
-            label: 'Edit Profile',
+            label: 'Manage Prescriptions',
           ),
         ],
       ),

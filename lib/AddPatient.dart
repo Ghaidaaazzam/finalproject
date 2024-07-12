@@ -151,6 +151,9 @@ class _AddPatientPageState extends State<AddPatientPage> {
       case 2:
         Navigator.pushNamed(context, '/addPatient');
         break;
+      case 3:
+        Navigator.pushNamed(context, '/managePrescriptions');
+        break;
     }
   }
 
@@ -380,7 +383,7 @@ class _AddPatientPageState extends State<AddPatientPage> {
             icon: Stack(
               children: <Widget>[
                 Icon(
-                  Icons.person,
+                  Icons.list_alt,
                   color: Colors.black,
                   size: 40,
                 ),
@@ -395,7 +398,7 @@ class _AddPatientPageState extends State<AddPatientPage> {
                 ),
               ],
             ),
-            label: 'Edit Profile',
+            label: 'Manage Prescriptions',
           ),
         ],
       ),

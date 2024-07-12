@@ -7,6 +7,7 @@ import 'prescription.dart';
 import 'AddPatient.dart';
 import 'TrackMedicineIntakePage.dart';
 import 'LoginPage.dart'; // Import the login page
+import 'ManagePrescriptionsPage.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -28,6 +29,8 @@ class MyApp extends StatelessWidget {
         '/addPatient': (context) => AddPatientPage(),
         '/trackMedicineIntake': (context) => TrackMedicineIntakePage(),
         '/login': (context) => LoginPage(), // Add the login page route
+        '/managePrescriptions': (context) =>
+            ManagePrescriptionsPage(), // Add the manage prescriptions page route
       },
     );
   }
@@ -55,6 +58,9 @@ class _DoctorHomePageState extends State<DoctorHomePage> {
         break;
       case 2:
         Navigator.pushNamed(context, '/addPatient');
+        break;
+      case 3:
+        Navigator.pushNamed(context, '/managePrescriptions');
         break;
     }
   }
@@ -351,7 +357,7 @@ class _DoctorHomePageState extends State<DoctorHomePage> {
             icon: Stack(
               children: <Widget>[
                 Icon(
-                  Icons.person,
+                  Icons.list_alt,
                   color: Colors.black,
                   size: 40,
                 ),
@@ -366,7 +372,7 @@ class _DoctorHomePageState extends State<DoctorHomePage> {
                 ),
               ],
             ),
-            label: 'Edit Profile',
+            label: 'Manage Prescriptions',
           ),
         ],
       ),
