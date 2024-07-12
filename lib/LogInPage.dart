@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'firebase_options.dart';
-import 'forgetPassword.dart';
 import 'Homepage.dart'; // Import the HomePage
+import 'doctorHomePage.dart'; // Import the DoctorHomePage
 import 'survey.dart'; // Import the Survey page
+import 'forgetPassword.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -67,27 +68,39 @@ class _LoginPageState extends State<LoginPage> {
     });
 
     try {
-      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+      QuerySnapshot patientQuerySnapshot = await FirebaseFirestore.instance
           .collection('patients')
           .where('ID', isEqualTo: enteredId)
           .where('Password', isEqualTo: enteredPassword)
           .get();
 
-      if (querySnapshot.docs.isNotEmpty) {
-        DocumentSnapshot userDoc = querySnapshot.docs.first;
+      QuerySnapshot doctorQuerySnapshot = await FirebaseFirestore.instance
+          .collection('doctor')
+          .where('ID', isEqualTo: enteredId)
+          .where('Password', isEqualTo: enteredPassword)
+          .get();
+
+      if (patientQuerySnapshot.docs.isNotEmpty) {
+        DocumentSnapshot userDoc = patientQuerySnapshot.docs.first;
         bool firstLogin = userDoc['FirstLogin'] ?? false;
 
         if (firstLogin) {
-          Navigator.push(
+          Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-              builder: (context) =>
-                  HomePage(userId: enteredId), // Navigate to HomePage
+              builder: (context) => HomePage(userId: enteredId),
             ),
           );
         } else {
           _showSurveyDialog(enteredId);
         }
+      } else if (doctorQuerySnapshot.docs.isNotEmpty) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => DoctorHomePage(),
+          ),
+        );
       } else {
         setState(() {
           _isIdInvalid = true;
@@ -120,7 +133,7 @@ class _LoginPageState extends State<LoginPage> {
                 style: TextStyle(color: Colors.red),
               ),
               onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
+                Navigator.of(context).pop();
               },
             ),
             TextButton(
@@ -202,7 +215,7 @@ class _LoginPageState extends State<LoginPage> {
                 obscureText: !_isPasswordVisible,
                 style: TextStyle(color: Colors.black),
               ),
-              if (_isPasswordInvalid) // Display error message under the password field
+              if (_isPasswordInvalid)
                 Padding(
                   padding: const EdgeInsets.only(top: 8.0),
                   child: Text(

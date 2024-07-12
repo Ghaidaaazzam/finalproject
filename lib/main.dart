@@ -1,7 +1,11 @@
 import 'package:finalproject/firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'LogInPage.dart'; // Import the LoginPage
+import 'LogInPage.dart';
+import 'doctorHomePage.dart';
+import 'prescription.dart';
+import 'AddPatient.dart';
+import 'TrackMedicineIntakePage.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -32,7 +36,15 @@ class PillPoppinApp extends StatelessWidget {
           bodyText1: TextStyle(color: Color(0xFF000000)), // Black
         ),
       ),
-      home: WelcomeScreen(),
+      initialRoute: '/',
+      routes: {
+        '/': (context) => WelcomeScreen(),
+        '/login': (context) => LoginPage(),
+        '/doctorHome': (context) => DoctorHomePage(),
+        '/prescription': (context) => PrescriptionPage(),
+        '/addPatient': (context) => AddPatientPage(),
+        '/trackMedicineIntake': (context) => TrackMedicineIntakePage(),
+      },
     );
   }
 }
@@ -44,51 +56,48 @@ class WelcomeScreen extends StatelessWidget {
       body: Stack(
         children: <Widget>[
           Column(
-            mainAxisAlignment: MainAxisAlignment.start, // Align to the top
+            mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
               Container(
                 alignment: Alignment.topCenter,
-                margin: EdgeInsets.only(top: 40), // Increased top margin
+                margin: EdgeInsets.only(top: 40),
                 child: Image.asset('images/FinalLogo.png',
-                    width: 500, height: 300), // Adjusted size
+                    width: 500, height: 300),
               ),
               SizedBox(height: 20),
               Text(
                 'Welcome to PillPoppin!',
                 style: TextStyle(
                   color: Colors.black,
-                  fontSize: 24, // Adjust the font size as needed
-                  fontWeight: FontWeight.bold, // Adjust font weight if needed
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
               Text(
                 'Keep your health in check,\n one pill at a time!',
                 style: TextStyle(
                   color: Color.fromARGB(255, 86, 87, 88),
-                  fontFamily: 'Georgia', // Use Georgia font
-                  fontSize: 20, // Adjust font size as needed
-                  fontStyle: FontStyle.italic, // Apply italic style
+                  fontFamily: 'Georgia',
+                  fontSize: 20,
+                  fontStyle: FontStyle.italic,
                 ),
-                textAlign: TextAlign.center, // Center align the text
+                textAlign: TextAlign.center,
               ),
-              SizedBox(height: 20), // Adjust the space between text and button
+              SizedBox(height: 20),
               Material(
                 color: Colors.transparent,
                 child: InkWell(
                   onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => LoginPage()),
-                    );
+                    Navigator.pushNamed(context, '/login');
                   },
                   borderRadius: BorderRadius.circular(30.0),
                   child: Ink(
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         colors: [
-                          Color.fromARGB(255, 244, 167, 193), // Pastel Pink
-                          Color(0xFFF06292), // Slightly darker Pastel Pink
+                          Color.fromARGB(255, 244, 167, 193),
+                          Color(0xFFF06292),
                         ],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
@@ -118,16 +127,16 @@ class WelcomeScreen extends StatelessWidget {
                   ),
                 ),
               ),
-              SizedBox(height: 50), // Add some bottom margin if needed
+              SizedBox(height: 50),
             ],
           ),
           Positioned(
             bottom: 0,
             right: 0,
             child: Image.asset(
-              'images/Doctor1.png', // Replace 'your_photo.png' with your actual photo path
-              width: 250, // Adjust the width as needed
-              height: 250, // Adjust the height as needed
+              'images/Doctor1.png',
+              width: 250,
+              height: 250,
             ),
           ),
         ],

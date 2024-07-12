@@ -5,7 +5,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:finalproject/firebase_options.dart';
 import 'prescription.dart';
 import 'AddPatient.dart';
-import 'TrackMedicineIntakePage.dart'; // Import the new tracking page
+import 'TrackMedicineIntakePage.dart';
+import 'LoginPage.dart'; // Import the login page
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -26,6 +27,7 @@ class MyApp extends StatelessWidget {
         '/doctorHome': (context) => DoctorHomePage(),
         '/addPatient': (context) => AddPatientPage(),
         '/trackMedicineIntake': (context) => TrackMedicineIntakePage(),
+        '/login': (context) => LoginPage(), // Add the login page route
       },
     );
   }
@@ -113,6 +115,10 @@ class _DoctorHomePageState extends State<DoctorHomePage> {
     return allPrescriptions;
   }
 
+  void _logout() {
+    Navigator.pushReplacementNamed(context, '/login');
+  }
+
   @override
   Widget build(BuildContext context) {
     DateFormat dateFormat = DateFormat('yyyy-MM-dd');
@@ -120,8 +126,14 @@ class _DoctorHomePageState extends State<DoctorHomePage> {
     return Scaffold(
       backgroundColor: Color.fromARGB(255, 217, 242, 255),
       appBar: AppBar(
-        title: Text('Doctor Home Page'),
+        title: Text(
+          'Doctor Home Page',
+          style:
+              TextStyle(color: Colors.black), // Change the text color to black
+        ),
         backgroundColor: Color.fromARGB(255, 244, 167, 193),
+        iconTheme: IconThemeData(
+            color: Colors.black), // Change the icon color to black
         actions: [
           IconButton(
             icon: Icon(Icons.refresh),
@@ -130,10 +142,8 @@ class _DoctorHomePageState extends State<DoctorHomePage> {
             },
           ),
           IconButton(
-            icon: Icon(Icons.add),
-            onPressed: () {
-              Navigator.pushNamed(context, '/prescription');
-            },
+            icon: Icon(Icons.logout),
+            onPressed: _logout,
           ),
         ],
       ),
