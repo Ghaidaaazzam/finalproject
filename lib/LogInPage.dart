@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'firebase_options.dart';
 import 'forgetPassword.dart';
 import 'Homepage.dart'; // Import the HomePage
+import 'doctorHomePage.dart'; // Import the DoctorHomePage
 import 'survey.dart'; // Import the Survey page
 
 void main() async {
@@ -67,14 +68,22 @@ class _LoginPageState extends State<LoginPage> {
     });
 
     try {
-      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+      // Check in patients collection
+      QuerySnapshot patientQuerySnapshot = await FirebaseFirestore.instance
           .collection('patients')
           .where('ID', isEqualTo: enteredId)
           .where('Password', isEqualTo: enteredPassword)
           .get();
 
-      if (querySnapshot.docs.isNotEmpty) {
-        DocumentSnapshot userDoc = querySnapshot.docs.first;
+      // Check in doctors collection
+      QuerySnapshot doctorQuerySnapshot = await FirebaseFirestore.instance
+          .collection('doctor')
+          .where('ID', isEqualTo: enteredId)
+          .where('Password', isEqualTo: enteredPassword)
+          .get();
+
+      if (patientQuerySnapshot.docs.isNotEmpty) {
+        DocumentSnapshot userDoc = patientQuerySnapshot.docs.first;
         bool firstLogin = userDoc['FirstLogin'] ?? false;
 
         if (firstLogin) {
@@ -88,6 +97,14 @@ class _LoginPageState extends State<LoginPage> {
         } else {
           _showSurveyDialog(enteredId);
         }
+      } else if (doctorQuerySnapshot.docs.isNotEmpty) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) =>
+                DoctorHomePage(), // Navigate to DoctorHomePage
+          ),
+        );
       } else {
         setState(() {
           _isIdInvalid = true;
