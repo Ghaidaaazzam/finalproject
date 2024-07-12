@@ -47,16 +47,12 @@ class _DoctorHomePageState extends State<DoctorHomePage> {
     });
     switch (index) {
       case 0:
-        Navigator.pushNamed(context, '/doctorHome');
         break;
       case 1:
         Navigator.pushNamed(context, '/prescription');
         break;
       case 2:
         Navigator.pushNamed(context, '/addPatient');
-        break;
-      case 3:
-        Navigator.pushNamed(context, '/editProfile');
         break;
     }
   }
@@ -298,6 +294,11 @@ class _DoctorHomePageState extends State<DoctorHomePage> {
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
+        selectedItemColor: Colors.black,
+        unselectedItemColor: Colors.black,
+        showUnselectedLabels: true,
+        selectedLabelStyle: TextStyle(color: Colors.black),
+        unselectedLabelStyle: TextStyle(color: Colors.black),
         items: [
           BottomNavigationBarItem(
             icon: Image.asset(
@@ -305,7 +306,7 @@ class _DoctorHomePageState extends State<DoctorHomePage> {
               height: 50.0,
               width: 50.0,
             ),
-            label: 'Logo',
+            label: 'Home Page',
           ),
           BottomNavigationBarItem(
             icon: Image.asset(

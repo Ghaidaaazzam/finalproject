@@ -86,10 +86,10 @@ class _PrescriptionPageState extends State<PrescriptionPage> {
   void _onItemTapped(int index) {
     switch (index) {
       case 0:
-        Navigator.pushNamed(context, '/');
+        Navigator.pushNamed(
+            context, '/doctorHome'); // Navigate to DoctorHomePage
         break;
       case 1:
-        Navigator.pushNamed(context, '/prescription');
         break;
       case 2:
         Navigator.pushNamed(context, '/addPatient');
@@ -639,6 +639,11 @@ class _PrescriptionPageState extends State<PrescriptionPage> {
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
+        selectedItemColor: Colors.black,
+        unselectedItemColor: Colors.black,
+        showUnselectedLabels: true,
+        selectedLabelStyle: TextStyle(color: Colors.black),
+        unselectedLabelStyle: TextStyle(color: Colors.black),
         items: [
           BottomNavigationBarItem(
             icon: Image.asset(
@@ -646,7 +651,7 @@ class _PrescriptionPageState extends State<PrescriptionPage> {
               height: 50.0,
               width: 50.0,
             ),
-            label: 'Logo',
+            label: 'Home Page',
           ),
           BottomNavigationBarItem(
             icon: Image.asset(
