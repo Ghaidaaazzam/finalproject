@@ -20,6 +20,7 @@ dependencies:
   flutter_datetime_picker: ^1.5.1
   flutter_local_notifications: ^10.0.0
   timezone: ^0.8.0
+  flutter_foreground_plugin: ^1.1.0
   # Add other dependencies here
 
 dev_dependencies:

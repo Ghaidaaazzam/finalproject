@@ -3,7 +3,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'UserProfile.dart'; // Import UserProfile
 import 'TakeORMiss.dart'; // Import MedicineIntakePage
 import 'HomePage.dart'; // Import HomePage
-import 'MyMedicines.dart';
 import 'notification_helper.dart'; // Import NotificationHelper
 import 'MedicineStock.dart'; // Import MedicineStock
 
@@ -24,6 +23,12 @@ class _MyMedicinesState extends State<MyMedicines> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     notificationHelper = NotificationHelper(context);
+  }
+
+  @override
+  void dispose() {
+    notificationHelper.removeObserver();
+    super.dispose();
   }
 
   void _onItemTapped(int index) {

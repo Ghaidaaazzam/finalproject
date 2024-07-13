@@ -6,10 +6,12 @@ import 'package:timezone/timezone.dart' as tz;
 import 'package:flutter/services.dart'; // Add this import for rootBundle
 import 'dart:convert'; // Add this import for LineSplitter
 
-class NotificationHelper {
+class NotificationHelper with WidgetsBindingObserver {
   late FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
   late BuildContext context;
   Map<String, String> medicineImages = {};
+  bool _isAppInForeground = true;
+  List<Map<String, dynamic>> _scheduledNotifications = [];
 
   NotificationHelper(BuildContext context) {
     this.context = context;
@@ -37,6 +39,23 @@ class NotificationHelper {
 
     // Load medicine images from CSV
     _loadMedicineImages();
+
+    // Add the observer to monitor app state
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  void removeObserver() {
+    WidgetsBinding.instance.removeObserver(this);
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    _isAppInForeground = state == AppLifecycleState.resumed;
+    if (_isAppInForeground) {
+      _cancelAllNotifications();
+    } else {
+      _rescheduleAllNotifications();
+    }
   }
 
   Future<void> _loadMedicineImages() async {
@@ -80,20 +99,62 @@ class NotificationHelper {
     // Use the prescription document path as the payload
     final payload = prescriptionDoc.path;
 
+    _scheduledNotifications.add({
+      'id': _scheduledNotifications.length,
+      'time': scheduleTime,
+      'message': message,
+      'details': platformChannelSpecifics,
+      'payload': payload,
+    });
+
+    if (_isAppInForeground) {
+      Future.delayed(scheduleTime.difference(now), () {
+        if (_isAppInForeground) {
+          _showPopup(message, payload);
+        } else {
+          _scheduleNotification(_scheduledNotifications.length, message,
+              scheduleTime, platformChannelSpecifics, payload);
+        }
+      });
+    } else {
+      _scheduleNotification(_scheduledNotifications.length, message,
+          scheduleTime, platformChannelSpecifics, payload);
+    }
+
+    print('Notification scheduled for $scheduleTime with payload: $payload');
+  }
+
+  void _scheduleNotification(int id, String message, tz.TZDateTime scheduleTime,
+      NotificationDetails details, String payload) async {
     await flutterLocalNotificationsPlugin.zonedSchedule(
-      0,
+      id,
       'Medicine Reminder',
       message,
       scheduleTime,
-      platformChannelSpecifics,
+      details,
       androidAllowWhileIdle: true,
       uiLocalNotificationDateInterpretation:
           UILocalNotificationDateInterpretation.absoluteTime,
       matchDateTimeComponents: DateTimeComponents.time,
       payload: payload,
     );
+  }
 
-    print('Notification scheduled for $scheduleTime with payload: $payload');
+  void _cancelAllNotifications() async {
+    await flutterLocalNotificationsPlugin.cancelAll();
+    print('All notifications canceled');
+  }
+
+  void _rescheduleAllNotifications() async {
+    for (var notification in _scheduledNotifications) {
+      _scheduleNotification(
+          notification['id'],
+          notification['message'],
+          notification['time'],
+          notification['details'],
+          notification['payload']);
+    }
+    print('All notifications rescheduled');
   }
 
   void _showPopup(String message, String prescriptionDocPath) async {
