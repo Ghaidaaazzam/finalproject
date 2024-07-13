@@ -566,23 +566,37 @@ class _ManagePrescriptionsPageState extends State<ManagePrescriptionsPage> {
         unselectedLabelStyle: TextStyle(color: Colors.black),
         items: [
           BottomNavigationBarItem(
-            icon:
-                Image.asset('images/SmallLogo.png', height: 50.0, width: 50.0),
+            icon: Image.asset(
+              'images/SmallLogo.png',
+              height: 50.0,
+              width: 50.0,
+            ),
             label: 'Home Page',
           ),
           BottomNavigationBarItem(
-            icon: Image.asset('images/prescriptionIcon.png',
-                height: 50.0, width: 50.0),
+            icon: Image.asset(
+              'images/prescriptionIcon.png',
+              height: 50.0,
+              width: 50.0,
+            ),
             label: 'Prescription',
           ),
           BottomNavigationBarItem(
             icon: Stack(
               children: <Widget>[
-                Icon(Icons.person, color: Colors.black, size: 40),
+                Icon(
+                  Icons.person,
+                  color: Colors.black,
+                  size: 40,
+                ),
                 Positioned(
                   right: 0,
                   bottom: 0,
-                  child: Icon(Icons.add_circle, color: Colors.blue, size: 24),
+                  child: Icon(
+                    Icons.add_circle,
+                    color: Colors.blue,
+                    size: 24,
+                  ),
                 ),
               ],
             ),
@@ -591,11 +605,19 @@ class _ManagePrescriptionsPageState extends State<ManagePrescriptionsPage> {
           BottomNavigationBarItem(
             icon: Stack(
               children: <Widget>[
-                Icon(Icons.list, color: Colors.black, size: 40),
+                Icon(
+                  Icons.list_alt,
+                  color: Colors.black,
+                  size: 40,
+                ),
                 Positioned(
                   right: 0,
                   bottom: 0,
-                  child: Icon(Icons.edit, color: Colors.blue, size: 24),
+                  child: Icon(
+                    Icons.edit,
+                    color: Colors.blue,
+                    size: 24,
+                  ),
                 ),
               ],
             ),

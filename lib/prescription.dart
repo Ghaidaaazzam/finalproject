@@ -133,7 +133,7 @@ class _PrescriptionPageState extends State<PrescriptionPage> {
         return AlertDialog(
           backgroundColor: Color.fromARGB(255, 255, 228, 237),
           title: Text(
-            'Cancel Confirmation',
+            'Cancellation Confirmation',
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
@@ -141,7 +141,7 @@ class _PrescriptionPageState extends State<PrescriptionPage> {
             ),
           ),
           content: Text(
-            'Are you sure you want to cancel?',
+            'Are you certain you wish to proceed with cancellation?',
             style: TextStyle(
               fontSize: 18,
               color: Colors.black,
@@ -193,7 +193,8 @@ class _PrescriptionPageState extends State<PrescriptionPage> {
         endDateController.text.isEmpty) {
       setState(() {
         _isFormValid = false;
-        _formErrorMessage = 'All fields except Doctor Notice are required.';
+        _formErrorMessage =
+            'Completion of all fields, excluding Doctor\'s Notice, is mandatory.';
       });
       return false;
     }
@@ -210,7 +211,7 @@ class _PrescriptionPageState extends State<PrescriptionPage> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text('Error'),
+            title: Text('Validation Error'),
             content: Text(_formErrorMessage),
             actions: <Widget>[
               TextButton(
@@ -238,8 +239,8 @@ class _PrescriptionPageState extends State<PrescriptionPage> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text('Error'),
-            content: Text('Patient not found.'),
+            title: Text('Validation Error'),
+            content: Text('Patient record not found.'),
             actions: <Widget>[
               TextButton(
                 child: Text('OK'),
@@ -286,8 +287,8 @@ class _PrescriptionPageState extends State<PrescriptionPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Success'),
-          content: Text('Prescription added successfully.'),
+          title: Text('Operation Successful'),
+          content: Text('Prescription has been successfully added.'),
           actions: <Widget>[
             TextButton(
               child: Text('OK'),
@@ -342,7 +343,7 @@ class _PrescriptionPageState extends State<PrescriptionPage> {
                   style: TextStyle(fontSize: 16),
                   decoration: InputDecoration(
                     prefixIcon: Icon(Icons.account_circle),
-                    labelText: 'Patient Id',
+                    labelText: 'Patient ID',
                     labelStyle: TextStyle(
                       color: Colors.blueGrey[900],
                       fontSize: 16,
@@ -366,7 +367,7 @@ class _PrescriptionPageState extends State<PrescriptionPage> {
                     style: TextStyle(fontSize: 16),
                     decoration: InputDecoration(
                       prefixIcon: Icon(Icons.medical_services),
-                      labelText: 'Name of Medicine',
+                      labelText: 'Medicine Name',
                       labelStyle: TextStyle(
                         color: Colors.blueGrey[900],
                         fontSize: 16,
@@ -463,7 +464,7 @@ class _PrescriptionPageState extends State<PrescriptionPage> {
                   style: TextStyle(fontSize: 16),
                   decoration: InputDecoration(
                     prefixIcon: Icon(Icons.date_range),
-                    labelText: 'Enter the start Date',
+                    labelText: 'Start Date',
                     labelStyle: TextStyle(
                       color: Colors.blueGrey[900],
                       fontSize: 16,
@@ -489,7 +490,7 @@ class _PrescriptionPageState extends State<PrescriptionPage> {
                   style: TextStyle(fontSize: 16),
                   decoration: InputDecoration(
                     prefixIcon: Icon(Icons.date_range),
-                    labelText: 'Enter the end Date',
+                    labelText: 'End Date',
                     labelStyle: TextStyle(
                       color: Colors.blueGrey[900],
                       fontSize: 16,
@@ -515,7 +516,7 @@ class _PrescriptionPageState extends State<PrescriptionPage> {
                   style: TextStyle(fontSize: 16),
                   decoration: InputDecoration(
                     prefixIcon: Icon(Icons.notes),
-                    labelText: 'Doctor Notice',
+                    labelText: 'Doctor\'s Notice',
                     labelStyle: TextStyle(
                       color: Colors.blueGrey[900],
                       fontSize: 16,
@@ -714,54 +715,54 @@ class _PrescriptionPageState extends State<PrescriptionPage> {
   String _getDailyDoseLabel() {
     switch (medicineForm.toLowerCase()) {
       case 'pill (tablet)':
-        return 'How many pills (tablets) in each day?';
+        return 'How many pills (tablets) to take each day?';
       case 'capsule':
-        return 'How many capsules in each day?';
+        return 'How many capsules to take each day?';
       case 'liquid (syrup)':
-        return 'How many ml in each day?';
+        return 'How many milliliters (ml) to take each day?';
       case 'injection (shot)':
-        return 'How many injections in each day?';
+        return 'How many injections to take each day?';
       case 'inhaler':
-        return 'How many puffs in each day?';
+        return 'How many puffs to take each day?';
       case 'topical (cream/ointment)':
-        return 'How many applications in each day?';
+        return 'How many applications to use each day?';
       case 'suppository':
-        return 'How many suppositories in each day?';
+        return 'How many suppositories to use each day?';
       case 'patch (transdermal)':
-        return 'How many patches in each day?';
+        return 'How many patches to use each day?';
       case 'drops (eye/ear)':
-        return 'How many drops in each day?';
+        return 'How many drops to use each day?';
       case 'powder (for reconstitution)':
-        return 'How many doses in each day?';
+        return 'How many doses to take each day?';
       default:
-        return 'How many in each day?';
+        return 'How many to take each day?';
     }
   }
 
   String _getPillsPerDoseLabel() {
     switch (medicineForm.toLowerCase()) {
       case 'pill (tablet)':
-        return 'How many pills (tablets) to take in a time?';
+        return 'How many pills (tablets) per dose?';
       case 'capsule':
-        return 'How many capsules to take in a time?';
+        return 'How many capsules per dose?';
       case 'liquid (syrup)':
-        return 'How many ml to take in a time?';
+        return 'How many milliliters (ml) per dose?';
       case 'injection (shot)':
-        return 'How many injections to take in a time?';
+        return 'How many injections per dose?';
       case 'inhaler':
-        return 'How many puffs to take in a time?';
+        return 'How many puffs per dose?';
       case 'topical (cream/ointment)':
-        return 'How many applications to take in a time?';
+        return 'How many applications per dose?';
       case 'suppository':
-        return 'How many suppositories to take in a time?';
+        return 'How many suppositories per dose?';
       case 'patch (transdermal)':
-        return 'How many patches to use in a time?';
+        return 'How many patches per dose?';
       case 'drops (eye/ear)':
-        return 'How many drops to take in a time?';
+        return 'How many drops per dose?';
       case 'powder (for reconstitution)':
-        return 'How many doses to take in a time?';
+        return 'How many doses per dose?';
       default:
-        return 'How many to take in a time?';
+        return 'How many per dose?';
     }
   }
 }

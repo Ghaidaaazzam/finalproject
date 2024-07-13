@@ -185,7 +185,7 @@ class _AddPatientPageState extends State<AddPatientPage> {
                     focusNode: _patientIdFocusNode,
                     keyboardType: TextInputType.number,
                     decoration: InputDecoration(
-                      labelText: 'Enter Patient ID',
+                      labelText: 'Patient ID',
                       labelStyle: TextStyle(
                         color: Colors.blueGrey[900],
                         fontSize: 20,
@@ -211,7 +211,7 @@ class _AddPatientPageState extends State<AddPatientPage> {
                     controller: _patientEmailController,
                     focusNode: _patientEmailFocusNode,
                     decoration: InputDecoration(
-                      labelText: 'Enter Patient Email',
+                      labelText: 'Patient Email',
                       labelStyle: TextStyle(
                         color: Colors.blueGrey[900],
                         fontSize: 20,
@@ -235,7 +235,7 @@ class _AddPatientPageState extends State<AddPatientPage> {
                     focusNode: _contactNumberFocusNode,
                     keyboardType: TextInputType.number,
                     decoration: InputDecoration(
-                      labelText: 'Enter Contact Number',
+                      labelText: 'Contact Number',
                       labelStyle: TextStyle(
                         color: Colors.blueGrey[900],
                         fontSize: 20,
@@ -259,7 +259,7 @@ class _AddPatientPageState extends State<AddPatientPage> {
                     focusNode: _contactNumberFocusNode2,
                     keyboardType: TextInputType.number,
                     decoration: InputDecoration(
-                      labelText: 'Enter Contact Number 2',
+                      labelText: 'Contact Number 2',
                       labelStyle: TextStyle(
                         color: Colors.blueGrey[900],
                         fontSize: 20,
