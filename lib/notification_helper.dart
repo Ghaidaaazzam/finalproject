@@ -170,8 +170,8 @@ class NotificationHelper {
                     ),
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Color(
-                            0xFFFFF176), // Yellow color for "Remind me later"
+                        backgroundColor: Color.fromARGB(255, 201, 19,
+                            19), // Red color for "I didn't get it"
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10.0),
                         ),
@@ -180,14 +180,32 @@ class NotificationHelper {
                         _updateIntakeStatus(
                             prescriptionDocPath, false); // Mark as missed
                         Navigator.of(context).pop();
-                        // Add logic to reschedule the notification
                       },
                       child: Text(
-                        'Remind me later',
+                        'I didn\'t get it',
                         style: TextStyle(color: Colors.black),
                       ),
                     ),
                   ],
+                ),
+                SizedBox(height: 10),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor:
+                        Color(0xFFFFD700), // Yellow color for "Remind me later"
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                  ),
+                  onPressed: () {
+                    print("Remind me later button pressed");
+                    Navigator.of(context).pop();
+                    _selectTimeForReschedule(context, prescriptionDocPath);
+                  },
+                  child: Text(
+                    'Remind me later',
+                    style: TextStyle(color: Colors.black),
+                  ),
                 ),
               ],
             ),
@@ -195,6 +213,84 @@ class NotificationHelper {
         );
       },
     );
+  }
+
+  Future<void> _selectTimeForReschedule(
+      BuildContext context, String prescriptionDocPath) async {
+    TimeOfDay initialTime = TimeOfDay.now();
+
+    final TimeOfDay? picked = await showTimePicker(
+      context: context,
+      initialTime: initialTime,
+      builder: (BuildContext context, Widget? child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: ColorScheme.light(
+              primary: Color(0xFFF06292), // header background color
+              onPrimary: Colors.white, // header text color
+              onSurface: Colors.black, // body text color
+            ),
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.black, // button text color
+                side:
+                    BorderSide(color: Color(0xFFF06292)), // button border color
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+              ),
+            ),
+          ),
+          child: MediaQuery(
+            data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
+            child: child!,
+          ),
+        );
+      },
+    );
+
+    if (picked != null) {
+      final scheduleTime = tz.TZDateTime.from(
+        DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day,
+            picked.hour, picked.minute),
+        tz.local,
+      );
+
+      // Update the new time in Firestore
+      final docRef = FirebaseFirestore.instance.doc(prescriptionDocPath);
+      final docSnapshot = await docRef.get();
+      if (docSnapshot.exists) {
+        final prescriptionData = docSnapshot.data() as Map<String, dynamic>;
+        List<dynamic> times = prescriptionData['times'] ?? [];
+        times.add(
+            "${picked.hour.toString().padLeft(2, '0')}:${picked.minute.toString().padLeft(2, '0')}");
+        await docRef.update({'times': times});
+        print('Updated times in Firestore: $times');
+      }
+
+      await flutterLocalNotificationsPlugin.zonedSchedule(
+        0,
+        'Medicine Reminder',
+        'Time to take your medicine!',
+        scheduleTime,
+        NotificationDetails(
+          android: AndroidNotificationDetails(
+            'your_channel_id',
+            'your_channel_name',
+            channelDescription: 'your_channel_description',
+            importance: Importance.max,
+            priority: Priority.high,
+            showWhen: false,
+          ),
+        ),
+        androidAllowWhileIdle: true,
+        uiLocalNotificationDateInterpretation:
+            UILocalNotificationDateInterpretation.absoluteTime,
+        payload: prescriptionDocPath,
+      );
+
+      print('Notification rescheduled for $scheduleTime');
+    }
   }
 
   Future<void> _updateIntakeStatus(
