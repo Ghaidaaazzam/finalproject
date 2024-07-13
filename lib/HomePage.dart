@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
-import 'dart:convert';
 import 'package:flutter/services.dart';
+import 'dart:convert';
 import 'MyMedicines.dart';
 import 'UserProfile.dart';
 import 'TakeORMiss.dart';
@@ -26,7 +26,6 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     loadMedicineDetails();
-    fetchMedicationsForToday();
   }
 
   void _onItemTapped(int index) {
@@ -82,63 +81,186 @@ class _HomePageState extends State<HomePage> {
     print("Medicine details loaded: $medicineDetails"); // Debug print
   }
 
-  Future<void> fetchMedicationsForToday() async {
-    try {
-      String userId = widget.userId;
-      DateTime today = DateTime.now();
-      String formattedToday = DateFormat('yyyy-MM-dd').format(today);
-      print('Formatted date for today: $formattedToday');
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Color.fromARGB(255, 217, 242, 255),
+      body: Column(
+        children: [
+          Container(
+            padding: EdgeInsets.all(16.0),
+            decoration: BoxDecoration(
+              color: Color.fromARGB(255, 244, 167, 193),
+              borderRadius: BorderRadius.vertical(
+                bottom: Radius.circular(30.0),
+              ),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Image.asset('images/Medicines.png', width: 40, height: 40),
+                  ],
+                ),
+                SizedBox(height: 10),
+                Text(
+                  'Today is ${DateFormat('MMMM dd, yyyy').format(DateTime.now())}',
+                  style: TextStyle(fontSize: 18, color: Colors.white),
+                ),
+                SizedBox(height: 5),
+                Text(
+                  'Take your medicine on time and stay healthy!',
+                  style: TextStyle(fontSize: 16, color: Colors.white),
+                ),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Text(
+              "Today's Medicine List",
+              style: TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+                color: Colors.blueGrey[900],
+              ),
+            ),
+          ),
+          Expanded(
+            child: StreamBuilder<QuerySnapshot>(
+              stream: FirebaseFirestore.instance
+                  .collection('patients')
+                  .where('ID', isEqualTo: widget.userId)
+                  .snapshots(),
+              builder: (context, patientSnapshot) {
+                if (patientSnapshot.connectionState ==
+                    ConnectionState.waiting) {
+                  return Center(child: CircularProgressIndicator());
+                }
 
-      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-          .collection('patients')
-          .where('ID', isEqualTo: userId)
-          .get();
+                if (patientSnapshot.hasError) {
+                  return Center(child: Text('Something went wrong'));
+                }
 
-      if (querySnapshot.docs.isNotEmpty) {
-        DocumentSnapshot userDoc = querySnapshot.docs.first;
-        CollectionReference prescriptions =
-            userDoc.reference.collection('prescriptions');
+                if (!patientSnapshot.hasData ||
+                    patientSnapshot.data!.docs.isEmpty) {
+                  return Center(child: Text('No patient data found'));
+                }
 
-        QuerySnapshot prescriptionsSnapshot = await prescriptions.get();
-        prescriptionsSnapshot.docs.forEach((doc) {
-          Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-          DateTime startDate = DateTime.parse(data['startDate']);
-          DateTime endDate = DateTime.parse(data['endDate']);
-          print('Checking prescription: ${data['medicineName']}');
-          print(
-              'Start date: ${data['startDate']}, End date: ${data['endDate']}');
+                final patientDoc = patientSnapshot.data!.docs.first;
+                final prescriptionsStream = FirebaseFirestore.instance
+                    .collection('patients')
+                    .doc(patientDoc.id)
+                    .collection('prescriptions')
+                    .snapshots();
 
-          if (today.isAfter(startDate.subtract(Duration(days: 1))) &&
-              today.isBefore(endDate.add(Duration(days: 1)))) {
-            print('Adding medication: ${data['medicineName']}');
-            print(
-                'Medicine details: ${medicineDetails[data['medicineName']]}'); // Debug print
-            setState(() {
-              medications.add({
-                'name': data['medicineName'],
-                'form': medicineDetails[data['medicineName']]?['form'] ??
-                    'No form available',
-                'image': medicineDetails[data['medicineName']]?['image'] ?? '',
-                'warning': medicineDetails[data['medicineName']]?['warning'] ??
-                    'No warning available',
-                'sideEffect': medicineDetails[data['medicineName']]
-                        ?['sideEffect'] ??
-                    'No side effect available',
-              });
-            });
-          }
-        });
-      }
+                return StreamBuilder<QuerySnapshot>(
+                  stream: prescriptionsStream,
+                  builder: (context, prescriptionsSnapshot) {
+                    if (prescriptionsSnapshot.connectionState ==
+                        ConnectionState.waiting) {
+                      return Center(child: CircularProgressIndicator());
+                    }
 
-      setState(() {
-        isLoading = false;
-      });
-    } catch (e) {
-      print('Error fetching medications: $e');
-      setState(() {
-        isLoading = false;
-      });
-    }
+                    if (prescriptionsSnapshot.hasError) {
+                      return Center(
+                          child:
+                              Text('Something went wrong with prescriptions'));
+                    }
+
+                    if (!prescriptionsSnapshot.hasData ||
+                        prescriptionsSnapshot.data!.docs.isEmpty) {
+                      return Center(child: Text('No prescriptions found'));
+                    }
+
+                    medications.clear();
+                    DateTime today = DateTime.now();
+
+                    prescriptionsSnapshot.data!.docs.forEach((doc) {
+                      Map<String, dynamic> data =
+                          doc.data() as Map<String, dynamic>;
+                      DateTime startDate = DateTime.parse(data['startDate']);
+                      DateTime endDate = DateTime.parse(data['endDate']);
+                      print('Checking prescription: ${data['medicineName']}');
+                      print(
+                          'Start date: ${data['startDate']}, End date: ${data['endDate']}');
+
+                      if (today
+                              .isAfter(startDate.subtract(Duration(days: 1))) &&
+                          today.isBefore(endDate.add(Duration(days: 1)))) {
+                        print('Adding medication: ${data['medicineName']}');
+                        print(
+                            'Medicine details: ${medicineDetails[data['medicineName']]}'); // Debug print
+                        medications.add({
+                          'name': data['medicineName'],
+                          'form': medicineDetails[data['medicineName']]
+                                  ?['form'] ??
+                              'No form available',
+                          'image': medicineDetails[data['medicineName']]
+                                  ?['image'] ??
+                              '',
+                          'warning': medicineDetails[data['medicineName']]
+                                  ?['warning'] ??
+                              'No warning available',
+                          'sideEffect': medicineDetails[data['medicineName']]
+                                  ?['sideEffect'] ??
+                              'No side effect available',
+                        });
+                      }
+                    });
+
+                    print(
+                        'Medications to display: $medications'); // Debug print
+
+                    return ListView.builder(
+                      itemCount: medications.length,
+                      itemBuilder: (context, index) {
+                        return _buildMedicineCard(medications[index], index);
+                      },
+                    );
+                  },
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _selectedIndex,
+        onTap: _onItemTapped,
+        items: [
+          BottomNavigationBarItem(
+            icon: Image.asset(
+              'images/SmallLogo.png',
+              height: 40.0,
+              width: 40.0,
+            ),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person, size: 30, color: Colors.black),
+            label: 'Profile',
+          ),
+          BottomNavigationBarItem(
+            icon: Image.asset(
+              'images/Medicines.png',
+              width: 40,
+              height: 40,
+            ),
+            label: 'Medicines',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.bar_chart, size: 30, color: Colors.black),
+            label: 'Statistics',
+          ),
+        ],
+        selectedItemColor: Colors.black,
+        unselectedItemColor: Colors.black,
+        showUnselectedLabels: true,
+      ),
+    );
   }
 
   void _showEnlargedImage(String imagePath) {
@@ -317,106 +439,6 @@ class _HomePageState extends State<HomePage> {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Color.fromARGB(255, 217, 242, 255),
-      body: Column(
-        children: [
-          Container(
-            padding: EdgeInsets.all(16.0),
-            decoration: BoxDecoration(
-              color: Color.fromARGB(255, 244, 167, 193),
-              borderRadius: BorderRadius.vertical(
-                bottom: Radius.circular(30.0),
-              ),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Image.asset('images/Medicines.png', width: 40, height: 40),
-                  ],
-                ),
-                SizedBox(height: 10),
-                Text(
-                  'Today is ${DateFormat('MMMM dd, yyyy').format(DateTime.now())}',
-                  style: TextStyle(fontSize: 18, color: Colors.white),
-                ),
-                SizedBox(height: 5),
-                Text(
-                  'Take your medicine on time and stay healthy!',
-                  style: TextStyle(fontSize: 16, color: Colors.white),
-                ),
-              ],
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Text(
-              "Today's Medicine List",
-              style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-                color: Colors.blueGrey[900],
-              ),
-            ),
-          ),
-          Expanded(
-            child: Center(
-              child: isLoading
-                  ? CircularProgressIndicator()
-                  : medications.isEmpty
-                      ? Text('No medications for today.')
-                      : ListView.builder(
-                          itemCount: medications.length,
-                          itemBuilder: (context, index) {
-                            return _buildMedicineCard(
-                                medications[index], index);
-                          },
-                        ),
-            ),
-          ),
-        ],
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
-        items: [
-          BottomNavigationBarItem(
-            icon: Image.asset(
-              'images/SmallLogo.png',
-              height: 40.0,
-              width: 40.0,
-            ),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person, size: 30, color: Colors.black),
-            label: 'Profile',
-          ),
-          BottomNavigationBarItem(
-            icon: Image.asset(
-              'images/Medicines.png',
-              width: 40,
-              height: 40,
-            ),
-            label: 'Medicines',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.bar_chart, size: 30, color: Colors.black),
-            label: 'Statistics',
-          ),
-        ],
-        selectedItemColor: Colors.black,
-        unselectedItemColor: Colors.black,
-        showUnselectedLabels: true,
       ),
     );
   }
