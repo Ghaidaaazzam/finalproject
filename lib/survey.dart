@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'LogInPage.dart'; // Import the LoginPage
-import 'myMedicines.dart'; // Import the MyMedicines page
+import 'HomePage.dart'; // Import the HomePage
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:timezone/data/latest.dart' as tz;
@@ -490,11 +490,10 @@ class _TimeQuestionScreenState extends State<TimeQuestionScreen> {
       print('Failed to update FirstLogin: $error');
     });
 
-    // Navigate to MyMedicines page
+    // Navigate to HomePage
     Navigator.push(
       context,
-      MaterialPageRoute(
-          builder: (context) => MyMedicines(userId: widget.userId)),
+      MaterialPageRoute(builder: (context) => HomePage(userId: widget.userId)),
     );
 
     ScaffoldMessenger.of(context).showSnackBar(
