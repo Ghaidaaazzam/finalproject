@@ -16,23 +16,24 @@ class NotificationHelper with WidgetsBindingObserver {
   NotificationHelper(BuildContext context) {
     this.context = context;
     flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
-    final initializationSettingsAndroid =
+
+    const AndroidInitializationSettings initializationSettingsAndroid =
         AndroidInitializationSettings('app_icon');
-    final initializationSettings = InitializationSettings(
+
+    final InitializationSettings initializationSettings =
+        InitializationSettings(
       android: initializationSettingsAndroid,
     );
 
-    flutterLocalNotificationsPlugin.initialize(initializationSettings,
-        onDidReceiveNotificationResponse:
-            (NotificationResponse response) async {
-      // Handle notification tapped logic here
-      print("Notification Tapped");
-      if (response.payload != null) {
-        final prescriptionDocPath = response.payload!;
-        print('Payload data: prescriptionDocPath = $prescriptionDocPath');
-        _showPopup("Time to take your medicine!", prescriptionDocPath);
-      }
-    });
+    flutterLocalNotificationsPlugin.initialize(
+      initializationSettings,
+      onDidReceiveNotificationResponse: (NotificationResponse response) async {
+        if (response.payload != null) {
+          final prescriptionDocPath = response.payload!;
+          _showPopup("Time to take your medicine!", prescriptionDocPath);
+        }
+      },
+    );
 
     // Initialize timezone data
     tz.initializeTimeZones();
