@@ -183,10 +183,16 @@ class NotificationHelper with WidgetsBindingObserver {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Image.asset(
-                  imagePath,
-                  height: 100,
-                  width: 100,
+                GestureDetector(
+                  onTap: () {
+                    _showEnlargedImage(context, imagePath);
+                  },
+                  child: Image.asset(
+                    imagePath,
+                    height: 300,
+                    width: 300,
+                    fit: BoxFit.contain,
+                  ),
                 ),
                 SizedBox(height: 20),
                 Text(
@@ -267,6 +273,48 @@ class NotificationHelper with WidgetsBindingObserver {
                   child: Text(
                     'Remind me later',
                     style: TextStyle(color: Colors.black),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _showEnlargedImage(BuildContext context, String imagePath) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          child: GestureDetector(
+            onTap: () {
+              Navigator.of(context).pop();
+            },
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Image.asset(imagePath, fit: BoxFit.contain),
+                SizedBox(height: 10),
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text(
+                    'Close',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                    ),
+                  ),
+                  style: TextButton.styleFrom(
+                    backgroundColor: Colors.black54,
+                    padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
                   ),
                 ),
               ],
