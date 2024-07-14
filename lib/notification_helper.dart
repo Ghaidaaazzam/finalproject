@@ -183,10 +183,13 @@ class NotificationHelper with WidgetsBindingObserver {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Image.asset(
-                  imagePath,
-                  height: 100,
-                  width: 100,
+                GestureDetector(
+                  onTap: () => _showEnlargedImage(imagePath),
+                  child: Image.asset(
+                    imagePath,
+                    height: 300,
+                    width: 300,
+                  ),
                 ),
                 SizedBox(height: 20),
                 Text(
@@ -271,6 +274,43 @@ class NotificationHelper with WidgetsBindingObserver {
                 ),
               ],
             ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _showEnlargedImage(String imagePath) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Image.asset(imagePath, fit: BoxFit.contain),
+              SizedBox(height: 10),
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text(
+                  'Close',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                  ),
+                ),
+                style: TextButton.styleFrom(
+                  backgroundColor: Colors.black54,
+                  padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+              ),
+            ],
           ),
         );
       },

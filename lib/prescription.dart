@@ -5,6 +5,7 @@ import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'dart:convert';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 class PrescriptionPage extends StatefulWidget {
   @override
@@ -30,6 +31,7 @@ class _PrescriptionPageState extends State<PrescriptionPage> {
   String _formErrorMessage = '';
   String medicineForm = '';
   int medicineCapacity = 0;
+  List<TimeOfDay?> times = [];
 
   @override
   void initState() {
@@ -40,6 +42,13 @@ class _PrescriptionPageState extends State<PrescriptionPage> {
       if (!patientIdController.text.isEmpty) {
         _checkPatientId(patientIdController.text);
       }
+    });
+
+    dailyDoseController.addListener(() {
+      setState(() {
+        int dailyDose = int.tryParse(dailyDoseController.text) ?? 0;
+        times = List<TimeOfDay?>.filled(dailyDose, null);
+      });
     });
   }
 
@@ -126,6 +135,44 @@ class _PrescriptionPageState extends State<PrescriptionPage> {
     }
   }
 
+  Future<void> _selectTime(BuildContext context, int index) async {
+    final TimeOfDay? picked = await showTimePicker(
+      context: context,
+      initialTime: times[index] ?? TimeOfDay.now(),
+      builder: (BuildContext context, Widget? child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: ColorScheme.light(
+              primary: Color(0xFFF06292), // header background color
+              onPrimary: Colors.white, // header text color
+              onSurface: Colors.black, // body text color
+            ),
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.black, // button text color
+                side:
+                    BorderSide(color: Color(0xFFF06292)), // button border color
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+              ),
+            ),
+          ),
+          child: MediaQuery(
+            data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
+            child: child!,
+          ),
+        );
+      },
+    );
+
+    if (picked != null) {
+      setState(() {
+        times[index] = picked;
+      });
+    }
+  }
+
   void _showCancelConfirmationDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -168,6 +215,7 @@ class _PrescriptionPageState extends State<PrescriptionPage> {
                   startDateController.clear();
                   endDateController.clear();
                   doctorNoticeController.clear();
+                  times = [];
                 });
               },
               child: Text('Yes'),
@@ -190,11 +238,12 @@ class _PrescriptionPageState extends State<PrescriptionPage> {
         dailyDoseController.text.isEmpty ||
         pillsPerDoseController.text.isEmpty ||
         startDateController.text.isEmpty ||
-        endDateController.text.isEmpty) {
+        endDateController.text.isEmpty ||
+        times.any((time) => time == null)) {
       setState(() {
         _isFormValid = false;
         _formErrorMessage =
-            'Completion of all fields, excluding Doctor\'s Notice, is mandatory.';
+            'Completion of all fields, including all medicine times and excluding Doctor\'s Notice, is mandatory.';
       });
       return false;
     }
@@ -269,6 +318,10 @@ class _PrescriptionPageState extends State<PrescriptionPage> {
     int capacity = medicineData[medicineName]!['capacity'] as int;
     print('Adding prescription with capacity: $capacity'); // Debug print
 
+    List<String> timesStr = times
+        .map((time) => time!.format(context))
+        .toList(); // Convert TimeOfDay to string
+
     DocumentReference newPrescriptionRef = prescriptions.doc();
     String prescriptionId = newPrescriptionRef.id;
 
@@ -281,6 +334,7 @@ class _PrescriptionPageState extends State<PrescriptionPage> {
       'endDate': endDate,
       'doctorNotice': doctorNotice,
       'capacity': capacity,
+      'times': timesStr,
     });
 
     showDialog(
@@ -309,65 +363,175 @@ class _PrescriptionPageState extends State<PrescriptionPage> {
       startDateController.clear();
       endDateController.clear();
       doctorNoticeController.clear();
+      times = [];
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Color.fromARGB(255, 217, 242, 255),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(height: 50),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    'Add Prescription',
-                    style: TextStyle(
-                      color: Colors.blueGrey[900],
-                      fontSize: 36,
-                      fontWeight: FontWeight.bold,
+    return MaterialApp(
+      localizationsDelegates: [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+      ],
+      supportedLocales: [
+        const Locale('en', 'US'), // English (US)
+        const Locale('en', 'GB'), // English (UK)
+      ],
+      locale: const Locale(
+          'en', 'GB'), // Set the locale to UK English for 24-hour format
+      theme: ThemeData(
+        colorScheme: ColorScheme.light(
+          primary: Color(0xFFA8DADC), // Pastel Blue
+          secondary: Color(0xFFFF9DC6), // Pastel Pink
+          background: Color.fromARGB(255, 217, 242, 255), // White
+          surface: Color.fromARGB(255, 175, 227, 252), // Pastel Bright Blue
+          onPrimary: Color(0xFFFFFFFF), // White
+          onSecondary: Color.fromARGB(255, 0, 0, 0), // Black
+          onBackground: Color(0xFFB0BEC5), // Light Gray
+          onSurface: Color(0xFFB0BEC5), // Light Gray
+        ),
+        textTheme: TextTheme(
+          displayLarge: TextStyle(color: Color(0xFF000000)), // Black
+          bodyLarge: TextStyle(color: Color(0xFF000000)), // Black
+        ),
+        timePickerTheme: TimePickerThemeData(
+          backgroundColor: Color(0xFFF8E1E9), // Light pastel pink
+          hourMinuteTextColor: Colors.black,
+          hourMinuteColor: Color(0xFFF06292), // Slightly darker pastel pink
+          dialHandColor: Color(0xFFF06292),
+          dialBackgroundColor: Colors.white,
+          entryModeIconColor: Color(0xFFF06292),
+          helpTextStyle: TextStyle(
+            color: Colors.black,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
+          hourMinuteTextStyle: TextStyle(
+            color: Colors.black,
+            fontSize: 32,
+            fontWeight: FontWeight.bold,
+          ),
+          dialTextColor: MaterialStateColor.resolveWith((states) =>
+              states.contains(MaterialState.selected)
+                  ? Colors.white
+                  : Colors.black),
+          inputDecorationTheme: InputDecorationTheme(
+            focusedBorder: UnderlineInputBorder(
+              borderSide: BorderSide(color: Color(0xFFF06292)),
+            ),
+          ),
+        ),
+      ),
+      home: Scaffold(
+        backgroundColor: Color.fromARGB(255, 217, 242, 255),
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(height: 50),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      'Add Prescription',
+                      style: TextStyle(
+                        color: Colors.blueGrey[900],
+                        fontSize: 36,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
-                ),
-                SizedBox(height: 40),
-                TextField(
-                  controller: patientIdController,
-                  keyboardType: TextInputType.number,
-                  style: TextStyle(fontSize: 16),
-                  decoration: InputDecoration(
-                    prefixIcon: Icon(Icons.account_circle),
-                    labelText: 'Patient ID',
-                    labelStyle: TextStyle(
-                      color: Colors.blueGrey[900],
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                    ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide(color: Colors.black),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide(color: Colors.black, width: 2.0),
-                    ),
-                    errorText: _isPatientIdValid ? null : 'Invalid Patient ID',
-                  ),
-                ),
-                SizedBox(height: 20),
-                TypeAheadField<String>(
-                  textFieldConfiguration: TextFieldConfiguration(
-                    controller: medicineNameController,
+                  SizedBox(height: 40),
+                  TextField(
+                    controller: patientIdController,
+                    keyboardType: TextInputType.number,
                     style: TextStyle(fontSize: 16),
                     decoration: InputDecoration(
-                      prefixIcon: Icon(Icons.medical_services),
-                      labelText: 'Medicine Name',
+                      prefixIcon: Icon(Icons.account_circle),
+                      labelText: 'Patient ID',
+                      labelStyle: TextStyle(
+                        color: Colors.blueGrey[900],
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide(color: Colors.black),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide(color: Colors.black, width: 2.0),
+                      ),
+                      errorText:
+                          _isPatientIdValid ? null : 'Invalid Patient ID',
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                  TypeAheadField<String>(
+                    textFieldConfiguration: TextFieldConfiguration(
+                      controller: medicineNameController,
+                      style: TextStyle(fontSize: 16),
+                      decoration: InputDecoration(
+                        prefixIcon: Icon(Icons.medical_services),
+                        labelText: 'Medicine Name',
+                        labelStyle: TextStyle(
+                          color: Colors.blueGrey[900],
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: BorderSide(color: Colors.black),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide:
+                              BorderSide(color: Colors.black, width: 2.0),
+                        ),
+                      ),
+                    ),
+                    suggestionsCallback: (pattern) {
+                      return medicineNames.where((name) =>
+                          name.toLowerCase().contains(pattern.toLowerCase()));
+                    },
+                    itemBuilder: (context, suggestion) {
+                      return ListTile(
+                        title: Text(suggestion),
+                      );
+                    },
+                    onSuggestionSelected: (suggestion) {
+                      setState(() {
+                        medicineNameController.text = suggestion;
+                        medicineForm = medicineData[suggestion]!['form']!;
+                        medicineCapacity =
+                            medicineData[suggestion]!['capacity']!;
+                        print(
+                            'Selected medicine: $suggestion, Form: $medicineForm, Capacity: $medicineCapacity'); // Debug print
+                      });
+                    },
+                  ),
+                  SizedBox(height: 20),
+                  Text(
+                    'Selected Medicine Form: $medicineForm',
+                    style: TextStyle(fontSize: 16, color: Colors.blueGrey[900]),
+                  ),
+                  SizedBox(height: 20),
+                  Text(
+                    'Selected Medicine Capacity: $medicineCapacity',
+                    style: TextStyle(fontSize: 16, color: Colors.blueGrey[900]),
+                  ),
+                  SizedBox(height: 20),
+                  TextField(
+                    controller: dailyDoseController,
+                    keyboardType: TextInputType.number,
+                    style: TextStyle(fontSize: 16),
+                    decoration: InputDecoration(
+                      prefixIcon: Icon(Icons.repeat),
+                      labelText: _getDailyDoseLabel(),
                       labelStyle: TextStyle(
                         color: Colors.blueGrey[900],
                         fontSize: 16,
@@ -383,331 +547,327 @@ class _PrescriptionPageState extends State<PrescriptionPage> {
                       ),
                     ),
                   ),
-                  suggestionsCallback: (pattern) {
-                    return medicineNames.where((name) =>
-                        name.toLowerCase().contains(pattern.toLowerCase()));
-                  },
-                  itemBuilder: (context, suggestion) {
-                    return ListTile(
-                      title: Text(suggestion),
+                  SizedBox(height: 20),
+                  ...times.asMap().entries.map((entry) {
+                    int index = entry.key;
+                    TimeOfDay? time = entry.value;
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 8.0),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              'Dose ${index + 1} Time:',
+                              style: TextStyle(
+                                color: Colors.blueGrey[900],
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            child: InkWell(
+                              onTap: () => _selectTime(context, index),
+                              child: InputDecorator(
+                                decoration: InputDecoration(
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                    borderSide: BorderSide(color: Colors.black),
+                                  ),
+                                  contentPadding: EdgeInsets.symmetric(
+                                      horizontal: 10, vertical: 15),
+                                  suffixIcon: Icon(Icons.access_time),
+                                ),
+                                child: Text(
+                                  time != null
+                                      ? time.format(context)
+                                      : 'Select Time',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     );
-                  },
-                  onSuggestionSelected: (suggestion) {
-                    setState(() {
-                      medicineNameController.text = suggestion;
-                      medicineForm = medicineData[suggestion]!['form']!;
-                      medicineCapacity = medicineData[suggestion]!['capacity']!;
-                      print(
-                          'Selected medicine: $suggestion, Form: $medicineForm, Capacity: $medicineCapacity'); // Debug print
-                    });
-                  },
-                ),
-                SizedBox(height: 20),
-                Text(
-                  'Selected Medicine Form: $medicineForm',
-                  style: TextStyle(fontSize: 16, color: Colors.blueGrey[900]),
-                ),
-                SizedBox(height: 20),
-                Text(
-                  'Selected Medicine Capacity: $medicineCapacity',
-                  style: TextStyle(fontSize: 16, color: Colors.blueGrey[900]),
-                ),
-                SizedBox(height: 20),
-                TextField(
-                  controller: dailyDoseController,
-                  keyboardType: TextInputType.number,
-                  style: TextStyle(fontSize: 16),
-                  decoration: InputDecoration(
-                    prefixIcon: Icon(Icons.repeat),
-                    labelText: _getDailyDoseLabel(),
-                    labelStyle: TextStyle(
-                      color: Colors.blueGrey[900],
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                    ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide(color: Colors.black),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide(color: Colors.black, width: 2.0),
-                    ),
-                  ),
-                ),
-                SizedBox(height: 20),
-                TextField(
-                  controller: pillsPerDoseController,
-                  keyboardType: TextInputType.number,
-                  style: TextStyle(fontSize: 16),
-                  decoration: InputDecoration(
-                    prefixIcon: Icon(Icons.format_list_numbered),
-                    labelText: _getPillsPerDoseLabel(),
-                    labelStyle: TextStyle(
-                      color: Colors.blueGrey[900],
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                    ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide(color: Colors.black),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide(color: Colors.black, width: 2.0),
-                    ),
-                  ),
-                ),
-                SizedBox(height: 20),
-                TextField(
-                  controller: startDateController,
-                  style: TextStyle(fontSize: 16),
-                  decoration: InputDecoration(
-                    prefixIcon: Icon(Icons.date_range),
-                    labelText: 'Start Date',
-                    labelStyle: TextStyle(
-                      color: Colors.blueGrey[900],
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                    ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide(color: Colors.black),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide(color: Colors.black, width: 2.0),
-                    ),
-                  ),
-                  onTap: () {
-                    FocusScope.of(context).requestFocus(new FocusNode());
-                    _selectDate(context, startDateController);
-                  },
-                ),
-                SizedBox(height: 20),
-                TextField(
-                  controller: endDateController,
-                  style: TextStyle(fontSize: 16),
-                  decoration: InputDecoration(
-                    prefixIcon: Icon(Icons.date_range),
-                    labelText: 'End Date',
-                    labelStyle: TextStyle(
-                      color: Colors.blueGrey[900],
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                    ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide(color: Colors.black),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide(color: Colors.black, width: 2.0),
-                    ),
-                  ),
-                  onTap: () {
-                    FocusScope.of(context).requestFocus(new FocusNode());
-                    _selectDate(context, endDateController);
-                  },
-                ),
-                SizedBox(height: 20),
-                TextField(
-                  controller: doctorNoticeController,
-                  style: TextStyle(fontSize: 16),
-                  decoration: InputDecoration(
-                    prefixIcon: Icon(Icons.notes),
-                    labelText: 'Doctor\'s Notice',
-                    labelStyle: TextStyle(
-                      color: Colors.blueGrey[900],
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                    ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide(color: Colors.black),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide(color: Colors.black, width: 2.0),
-                    ),
-                  ),
-                  maxLines: 3,
-                ),
-                SizedBox(height: 20),
-                _isFormValid
-                    ? Container()
-                    : Text(
-                        _formErrorMessage,
-                        style: TextStyle(color: Colors.red, fontSize: 16),
+                  }).toList(),
+                  SizedBox(height: 20),
+                  TextField(
+                    controller: pillsPerDoseController,
+                    keyboardType: TextInputType.number,
+                    style: TextStyle(fontSize: 16),
+                    decoration: InputDecoration(
+                      prefixIcon: Icon(Icons.format_list_numbered),
+                      labelText: _getPillsPerDoseLabel(),
+                      labelStyle: TextStyle(
+                        color: Colors.blueGrey[900],
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
                       ),
-                SizedBox(height: 40),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Expanded(
-                      child: Material(
-                        color: Colors.transparent,
-                        child: InkWell(
-                          onTap: () {
-                            _showCancelConfirmationDialog(context);
-                          },
-                          borderRadius: BorderRadius.circular(30.0),
-                          child: Ink(
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                colors: [
-                                  Color.fromARGB(255, 244, 167, 193),
-                                  Color(0xFFF06292),
-                                ],
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                                stops: [0.1, 1.0],
-                              ),
-                              borderRadius: BorderRadius.circular(30.0),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black26,
-                                  offset: Offset(0, 4),
-                                  blurRadius: 4.0,
-                                  spreadRadius: 1.0,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide(color: Colors.black),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide(color: Colors.black, width: 2.0),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                  TextField(
+                    controller: startDateController,
+                    style: TextStyle(fontSize: 16),
+                    decoration: InputDecoration(
+                      prefixIcon: Icon(Icons.date_range),
+                      labelText: 'Start Date',
+                      labelStyle: TextStyle(
+                        color: Colors.blueGrey[900],
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide(color: Colors.black),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide(color: Colors.black, width: 2.0),
+                      ),
+                    ),
+                    onTap: () {
+                      FocusScope.of(context).requestFocus(new FocusNode());
+                      _selectDate(context, startDateController);
+                    },
+                  ),
+                  SizedBox(height: 20),
+                  TextField(
+                    controller: endDateController,
+                    style: TextStyle(fontSize: 16),
+                    decoration: InputDecoration(
+                      prefixIcon: Icon(Icons.date_range),
+                      labelText: 'End Date',
+                      labelStyle: TextStyle(
+                        color: Colors.blueGrey[900],
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide(color: Colors.black),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide(color: Colors.black, width: 2.0),
+                      ),
+                    ),
+                    onTap: () {
+                      FocusScope.of(context).requestFocus(new FocusNode());
+                      _selectDate(context, endDateController);
+                    },
+                  ),
+                  SizedBox(height: 20),
+                  TextField(
+                    controller: doctorNoticeController,
+                    style: TextStyle(fontSize: 16),
+                    decoration: InputDecoration(
+                      prefixIcon: Icon(Icons.notes),
+                      labelText: 'Doctor\'s Notice',
+                      labelStyle: TextStyle(
+                        color: Colors.blueGrey[900],
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide(color: Colors.black),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide(color: Colors.black, width: 2.0),
+                      ),
+                    ),
+                    maxLines: 3,
+                  ),
+                  SizedBox(height: 20),
+                  _isFormValid
+                      ? Container()
+                      : Text(
+                          _formErrorMessage,
+                          style: TextStyle(color: Colors.red, fontSize: 16),
+                        ),
+                  SizedBox(height: 40),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Expanded(
+                        child: Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            onTap: () {
+                              _showCancelConfirmationDialog(context);
+                            },
+                            borderRadius: BorderRadius.circular(30.0),
+                            child: Ink(
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [
+                                    Color.fromARGB(255, 244, 167, 193),
+                                    Color(0xFFF06292),
+                                  ],
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                  stops: [0.1, 1.0],
                                 ),
-                              ],
-                            ),
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 12, vertical: 12),
-                            child: Center(
-                              child: Text(
-                                'Cancel',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold,
+                                borderRadius: BorderRadius.circular(30.0),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black26,
+                                    offset: Offset(0, 4),
+                                    blurRadius: 4.0,
+                                    spreadRadius: 1.0,
+                                  ),
+                                ],
+                              ),
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 12, vertical: 12),
+                              child: Center(
+                                child: Text(
+                                  'Cancel',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                               ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                    SizedBox(width: 20),
-                    Expanded(
-                      child: Material(
-                        color: Colors.transparent,
-                        child: InkWell(
-                          onTap: _addPrescription,
-                          borderRadius: BorderRadius.circular(30.0),
-                          child: Ink(
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                colors: [
-                                  Color.fromARGB(255, 244, 167, 193),
-                                  Color(0xFFF06292),
-                                ],
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                                stops: [0.1, 1.0],
-                              ),
-                              borderRadius: BorderRadius.circular(30.0),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black26,
-                                  offset: Offset(0, 4),
-                                  blurRadius: 4.0,
-                                  spreadRadius: 1.0,
+                      SizedBox(width: 20),
+                      Expanded(
+                        child: Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            onTap: _addPrescription,
+                            borderRadius: BorderRadius.circular(30.0),
+                            child: Ink(
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [
+                                    Color.fromARGB(255, 244, 167, 193),
+                                    Color(0xFFF06292),
+                                  ],
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                  stops: [0.1, 1.0],
                                 ),
-                              ],
-                            ),
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 12, vertical: 12),
-                            child: Center(
-                              child: Text(
-                                'Submit',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold,
+                                borderRadius: BorderRadius.circular(30.0),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black26,
+                                    offset: Offset(0, 4),
+                                    blurRadius: 4.0,
+                                    spreadRadius: 1.0,
+                                  ),
+                                ],
+                              ),
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 12, vertical: 12),
+                              child: Center(
+                                child: Text(
+                                  'Submit',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                               ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-              ],
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         ),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
-        selectedItemColor: Colors.black,
-        unselectedItemColor: Colors.black,
-        showUnselectedLabels: true,
-        selectedLabelStyle: TextStyle(color: Colors.black),
-        unselectedLabelStyle: TextStyle(color: Colors.black),
-        items: [
-          BottomNavigationBarItem(
-            icon: Image.asset(
-              'images/SmallLogo.png',
-              height: 50.0,
-              width: 50.0,
+        bottomNavigationBar: BottomNavigationBar(
+          currentIndex: _selectedIndex,
+          onTap: _onItemTapped,
+          selectedItemColor: Colors.black,
+          unselectedItemColor: Colors.black,
+          showUnselectedLabels: true,
+          selectedLabelStyle: TextStyle(color: Colors.black),
+          unselectedLabelStyle: TextStyle(color: Colors.black),
+          items: [
+            BottomNavigationBarItem(
+              icon: Image.asset(
+                'images/SmallLogo.png',
+                height: 50.0,
+                width: 50.0,
+              ),
+              label: 'Home Page',
             ),
-            label: 'Home Page',
-          ),
-          BottomNavigationBarItem(
-            icon: Image.asset(
-              'images/prescriptionIcon.png',
-              height: 50.0,
-              width: 50.0,
+            BottomNavigationBarItem(
+              icon: Image.asset(
+                'images/prescriptionIcon.png',
+                height: 50.0,
+                width: 50.0,
+              ),
+              label: 'Prescription',
             ),
-            label: 'Prescription',
-          ),
-          BottomNavigationBarItem(
-            icon: Stack(
-              children: <Widget>[
-                Icon(
-                  Icons.person,
-                  color: Colors.black,
-                  size: 40,
-                ),
-                Positioned(
-                  right: 0,
-                  bottom: 0,
-                  child: Icon(
-                    Icons.add_circle,
-                    color: Colors.blue,
-                    size: 24,
+            BottomNavigationBarItem(
+              icon: Stack(
+                children: <Widget>[
+                  Icon(
+                    Icons.person,
+                    color: Colors.black,
+                    size: 40,
                   ),
-                ),
-              ],
-            ),
-            label: 'Add Patient',
-          ),
-          BottomNavigationBarItem(
-            icon: Stack(
-              children: <Widget>[
-                Icon(
-                  Icons.list_alt,
-                  color: Colors.black,
-                  size: 40,
-                ),
-                Positioned(
-                  right: 0,
-                  bottom: 0,
-                  child: Icon(
-                    Icons.edit,
-                    color: Colors.blue,
-                    size: 24,
+                  Positioned(
+                    right: 0,
+                    bottom: 0,
+                    child: Icon(
+                      Icons.add_circle,
+                      color: Colors.blue,
+                      size: 24,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
+              label: 'Add Patient',
             ),
-            label: 'Manage Prescriptions',
-          ),
-        ],
+            BottomNavigationBarItem(
+              icon: Stack(
+                children: <Widget>[
+                  Icon(
+                    Icons.list_alt,
+                    color: Colors.black,
+                    size: 40,
+                  ),
+                  Positioned(
+                    right: 0,
+                    bottom: 0,
+                    child: Icon(
+                      Icons.edit,
+                      color: Colors.blue,
+                      size: 24,
+                    ),
+                  ),
+                ],
+              ),
+              label: 'Manage Prescriptions',
+            ),
+          ],
+        ),
       ),
     );
   }
