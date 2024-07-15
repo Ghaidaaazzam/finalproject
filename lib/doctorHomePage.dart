@@ -172,9 +172,13 @@ class _DoctorHomePageState extends State<DoctorHomePage> {
                   child: TextField(
                     decoration: InputDecoration(
                       labelText: 'Filter by ID',
-                      border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.search),
+                      labelStyle: TextStyle(color: Colors.black),
+                      border: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.black),
+                      ),
+                      prefixIcon: Icon(Icons.search, color: Colors.black),
                     ),
+                    style: TextStyle(color: Colors.black),
                     onChanged: (value) {
                       setState(() {
                         idFilter = value;
@@ -187,10 +191,14 @@ class _DoctorHomePageState extends State<DoctorHomePage> {
                   child: TextField(
                     decoration: InputDecoration(
                       labelText: 'Days Left (<=)',
-                      border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.filter_alt),
+                      labelStyle: TextStyle(color: Colors.black),
+                      border: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.black),
+                      ),
+                      prefixIcon: Icon(Icons.filter_alt, color: Colors.black),
                     ),
                     keyboardType: TextInputType.number,
+                    style: TextStyle(color: Colors.black),
                     onChanged: (value) {
                       setState(() {
                         daysLeftFilter =
@@ -420,6 +428,7 @@ class _DoctorHomePageState extends State<DoctorHomePage> {
                       borderSide: BorderSide(color: Colors.black),
                     ),
                   ),
+                  style: TextStyle(color: Colors.black),
                 ),
                 SizedBox(height: 10),
                 TextField(
@@ -435,6 +444,7 @@ class _DoctorHomePageState extends State<DoctorHomePage> {
                       borderSide: BorderSide(color: Colors.black),
                     ),
                   ),
+                  style: TextStyle(color: Colors.black),
                 ),
                 SizedBox(height: 10),
                 TextField(
@@ -450,6 +460,7 @@ class _DoctorHomePageState extends State<DoctorHomePage> {
                       borderSide: BorderSide(color: Colors.black),
                     ),
                   ),
+                  style: TextStyle(color: Colors.black),
                 ),
                 SizedBox(height: 10),
                 TextField(
@@ -466,6 +477,7 @@ class _DoctorHomePageState extends State<DoctorHomePage> {
                     ),
                   ),
                   readOnly: true,
+                  style: TextStyle(color: Colors.black),
                   onTap: () async {
                     DateTime? pickedDate = await showDatePicker(
                       context: context,
@@ -494,6 +506,7 @@ class _DoctorHomePageState extends State<DoctorHomePage> {
                     ),
                   ),
                   readOnly: true,
+                  style: TextStyle(color: Colors.black),
                   onTap: () async {
                     DateTime? pickedDate = await showDatePicker(
                       context: context,

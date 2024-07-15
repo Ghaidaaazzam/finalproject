@@ -334,20 +334,26 @@ class _TrackMedicineIntakePageState extends State<TrackMedicineIntakePage> {
                 keyboardType: TextInputType.number,
                 decoration: InputDecoration(
                   labelText: 'Enter Patient ID',
+                  labelStyle: TextStyle(color: Colors.black),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(15.0),
+                    borderSide: BorderSide(color: Colors.black),
                   ),
-                  prefixIcon: Icon(Icons.search),
+                  prefixIcon: Icon(Icons.search, color: Colors.black),
                   filled: true,
                   fillColor: Colors.white,
                 ),
+                style: TextStyle(color: Colors.black),
               ),
               suggestionsCallback: (pattern) {
                 return patientIds.where((id) => id.contains(pattern));
               },
               itemBuilder: (context, String? suggestion) {
                 return ListTile(
-                  title: Text(suggestion!),
+                  title: Text(
+                    suggestion!,
+                    style: TextStyle(color: Colors.black),
+                  ),
                 );
               },
               onSuggestionSelected: (String? suggestion) {

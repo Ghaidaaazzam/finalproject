@@ -387,13 +387,13 @@ class _PrescriptionPageState extends State<PrescriptionPage> {
           background: Color.fromARGB(255, 217, 242, 255), // White
           surface: Color.fromARGB(255, 175, 227, 252), // Pastel Bright Blue
           onPrimary: Color(0xFFFFFFFF), // White
-          onSecondary: Color.fromARGB(255, 0, 0, 0), // Black
-          onBackground: Color(0xFFB0BEC5), // Light Gray
-          onSurface: Color(0xFFB0BEC5), // Light Gray
+          onSecondary: Colors.black, // Black
+          onBackground: Colors.black, // Black
+          onSurface: Colors.black, // Black
         ),
         textTheme: TextTheme(
-          displayLarge: TextStyle(color: Color(0xFF000000)), // Black
-          bodyLarge: TextStyle(color: Color(0xFF000000)), // Black
+          displayLarge: TextStyle(color: Colors.black), // Black
+          bodyLarge: TextStyle(color: Colors.black), // Black
         ),
         timePickerTheme: TimePickerThemeData(
           backgroundColor: Color(0xFFF8E1E9), // Light pastel pink
@@ -449,12 +449,13 @@ class _PrescriptionPageState extends State<PrescriptionPage> {
                   TextField(
                     controller: patientIdController,
                     keyboardType: TextInputType.number,
-                    style: TextStyle(fontSize: 16),
+                    style: TextStyle(fontSize: 16, color: Colors.black),
                     decoration: InputDecoration(
-                      prefixIcon: Icon(Icons.account_circle),
+                      prefixIcon:
+                          Icon(Icons.account_circle, color: Colors.black),
                       labelText: 'Patient ID',
                       labelStyle: TextStyle(
-                        color: Colors.blueGrey[900],
+                        color: Colors.black,
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                       ),
@@ -474,12 +475,13 @@ class _PrescriptionPageState extends State<PrescriptionPage> {
                   TypeAheadField<String>(
                     textFieldConfiguration: TextFieldConfiguration(
                       controller: medicineNameController,
-                      style: TextStyle(fontSize: 16),
+                      style: TextStyle(fontSize: 16, color: Colors.black),
                       decoration: InputDecoration(
-                        prefixIcon: Icon(Icons.medical_services),
+                        prefixIcon:
+                            Icon(Icons.medical_services, color: Colors.black),
                         labelText: 'Medicine Name',
                         labelStyle: TextStyle(
-                          color: Colors.blueGrey[900],
+                          color: Colors.black,
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
                         ),
@@ -500,7 +502,8 @@ class _PrescriptionPageState extends State<PrescriptionPage> {
                     },
                     itemBuilder: (context, suggestion) {
                       return ListTile(
-                        title: Text(suggestion),
+                        title: Text(suggestion,
+                            style: TextStyle(color: Colors.black)),
                       );
                     },
                     onSuggestionSelected: (suggestion) {
@@ -517,23 +520,23 @@ class _PrescriptionPageState extends State<PrescriptionPage> {
                   SizedBox(height: 20),
                   Text(
                     'Selected Medicine Form: $medicineForm',
-                    style: TextStyle(fontSize: 16, color: Colors.blueGrey[900]),
+                    style: TextStyle(fontSize: 16, color: Colors.black),
                   ),
                   SizedBox(height: 20),
                   Text(
                     'Selected Medicine Capacity: $medicineCapacity',
-                    style: TextStyle(fontSize: 16, color: Colors.blueGrey[900]),
+                    style: TextStyle(fontSize: 16, color: Colors.black),
                   ),
                   SizedBox(height: 20),
                   TextField(
                     controller: dailyDoseController,
                     keyboardType: TextInputType.number,
-                    style: TextStyle(fontSize: 16),
+                    style: TextStyle(fontSize: 16, color: Colors.black),
                     decoration: InputDecoration(
-                      prefixIcon: Icon(Icons.repeat),
+                      prefixIcon: Icon(Icons.repeat, color: Colors.black),
                       labelText: _getDailyDoseLabel(),
                       labelStyle: TextStyle(
-                        color: Colors.blueGrey[900],
+                        color: Colors.black,
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                       ),
@@ -559,7 +562,7 @@ class _PrescriptionPageState extends State<PrescriptionPage> {
                             child: Text(
                               'Dose ${index + 1} Time:',
                               style: TextStyle(
-                                color: Colors.blueGrey[900],
+                                color: Colors.black,
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
                               ),
@@ -576,7 +579,8 @@ class _PrescriptionPageState extends State<PrescriptionPage> {
                                   ),
                                   contentPadding: EdgeInsets.symmetric(
                                       horizontal: 10, vertical: 15),
-                                  suffixIcon: Icon(Icons.access_time),
+                                  suffixIcon: Icon(Icons.access_time,
+                                      color: Colors.black),
                                 ),
                                 child: Text(
                                   time != null
@@ -598,12 +602,13 @@ class _PrescriptionPageState extends State<PrescriptionPage> {
                   TextField(
                     controller: pillsPerDoseController,
                     keyboardType: TextInputType.number,
-                    style: TextStyle(fontSize: 16),
+                    style: TextStyle(fontSize: 16, color: Colors.black),
                     decoration: InputDecoration(
-                      prefixIcon: Icon(Icons.format_list_numbered),
+                      prefixIcon:
+                          Icon(Icons.format_list_numbered, color: Colors.black),
                       labelText: _getPillsPerDoseLabel(),
                       labelStyle: TextStyle(
-                        color: Colors.blueGrey[900],
+                        color: Colors.black,
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                       ),
@@ -620,12 +625,12 @@ class _PrescriptionPageState extends State<PrescriptionPage> {
                   SizedBox(height: 20),
                   TextField(
                     controller: startDateController,
-                    style: TextStyle(fontSize: 16),
+                    style: TextStyle(fontSize: 16, color: Colors.black),
                     decoration: InputDecoration(
-                      prefixIcon: Icon(Icons.date_range),
+                      prefixIcon: Icon(Icons.date_range, color: Colors.black),
                       labelText: 'Start Date',
                       labelStyle: TextStyle(
-                        color: Colors.blueGrey[900],
+                        color: Colors.black,
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                       ),
@@ -646,12 +651,12 @@ class _PrescriptionPageState extends State<PrescriptionPage> {
                   SizedBox(height: 20),
                   TextField(
                     controller: endDateController,
-                    style: TextStyle(fontSize: 16),
+                    style: TextStyle(fontSize: 16, color: Colors.black),
                     decoration: InputDecoration(
-                      prefixIcon: Icon(Icons.date_range),
+                      prefixIcon: Icon(Icons.date_range, color: Colors.black),
                       labelText: 'End Date',
                       labelStyle: TextStyle(
-                        color: Colors.blueGrey[900],
+                        color: Colors.black,
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                       ),
@@ -672,12 +677,12 @@ class _PrescriptionPageState extends State<PrescriptionPage> {
                   SizedBox(height: 20),
                   TextField(
                     controller: doctorNoticeController,
-                    style: TextStyle(fontSize: 16),
+                    style: TextStyle(fontSize: 16, color: Colors.black),
                     decoration: InputDecoration(
-                      prefixIcon: Icon(Icons.notes),
+                      prefixIcon: Icon(Icons.notes, color: Colors.black),
                       labelText: 'Doctor\'s Notice',
                       labelStyle: TextStyle(
-                        color: Colors.blueGrey[900],
+                        color: Colors.black,
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                       ),
