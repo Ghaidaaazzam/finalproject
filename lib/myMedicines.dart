@@ -350,10 +350,6 @@ class _MyMedicinesState extends State<MyMedicines> {
                             style: TextStyle(color: Colors.black, fontSize: 22),
                           ),
                           Text(
-                            'Capacity: ${prescription['capacity']}',
-                            style: TextStyle(color: Colors.black, fontSize: 22),
-                          ),
-                          Text(
                             'Start Date: ${prescription['startDate']}',
                             style: TextStyle(color: Colors.black, fontSize: 22),
                           ),
@@ -361,13 +357,6 @@ class _MyMedicinesState extends State<MyMedicines> {
                             'End Date: ${prescription['endDate']}',
                             style: TextStyle(color: Colors.black, fontSize: 22),
                           ),
-                          if (prescription['doctorNotice'] != null &&
-                              prescription['doctorNotice'].isNotEmpty)
-                            Text(
-                              'Doctor\'s Notice: ${prescription['doctorNotice']}',
-                              style:
-                                  TextStyle(color: Colors.black, fontSize: 22),
-                            ),
                           SizedBox(height: 8),
                           Text(
                             'Times:',
