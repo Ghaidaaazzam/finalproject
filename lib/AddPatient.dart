@@ -6,6 +6,12 @@ import 'package:csv/csv.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:math';
 
+/*
+This Flutter app allows doctors to add new patients to a Firestore database. 
+It validates patient IDs using data from a CSV file, collects details like email and contact numbers, and ensures all fields are filled. After validation, the patient data, including a randomly generated password, is saved to Firestore. The app also 
+provides navigation between different pages like Home, Prescription, Add Patient, and Manage Prescriptions using a bottom navigation bar.
+ Upon successful submission, a success message is displayed, and the form fields are cleared.
+*/
 class AddPatientPage extends StatefulWidget {
   @override
   _AddPatientPageState createState() => _AddPatientPageState();

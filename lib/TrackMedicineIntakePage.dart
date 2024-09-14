@@ -4,6 +4,13 @@ import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:url_launcher/url_launcher.dart'; // Import the url_launcher package
 import 'package:intl/intl.dart'; // Import the intl package
 
+/*
+This code provides a `TrackMedicineIntakePage` interface that allows tracking of a patient's medication intake. 
+It enables users to search for a patient by their ID, displaying detailed medication intake information, including how much of their medication was taken or missed each day. 
+The app uses Firebase Firestore to fetch patient and prescription data, and the results are visualized through stacked bars representing taken and missed doses. 
+The interface also includes an emergency contact feature, allowing users to call or message the emergency contact listed for a patient.
+*/
+
 class TrackMedicineIntakePage extends StatefulWidget {
   @override
   _TrackMedicineIntakePageState createState() =>

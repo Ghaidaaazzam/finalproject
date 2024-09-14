@@ -3,6 +3,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 
+/* 
+The ManagePrescriptionsPage is a part of a doctor-side interface that allows doctors to search for patients by ID, view patient details, 
+and manage prescriptions.
+ Doctors can edit or delete prescriptions and remove entire patient records, with real-time data synchronization via Firebase Firestore. 
+The interface is user-friendly, with a clean design and easy navigation between patient details and prescription management functions.
+*/
+
 class ManagePrescriptionsPage extends StatefulWidget {
   @override
   _ManagePrescriptionsPageState createState() =>

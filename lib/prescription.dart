@@ -7,6 +7,12 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
+/*
+This class is designed for doctors to manage patient prescriptions efficiently using Firebase Firestore. 
+It includes features like patient ID validation, dynamic medicine selection from a CSV file, and a comprehensive form to enter prescription details, including dosage, intake times, and doctor's notes. 
+The app ensures all fields are completed through validation checks before saving the prescription data to Firestore. 
+With a user-friendly interface and navigation, it streamlines the prescription process, making it easier for doctors to manage patient medications.
+*/
 class PrescriptionPage extends StatefulWidget {
   @override
   _PrescriptionPageState createState() => _PrescriptionPageState();

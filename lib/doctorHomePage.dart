@@ -9,6 +9,12 @@ import 'TrackMedicineIntakePage.dart';
 import 'LoginPage.dart'; // Import the login page
 import 'ManagePrescriptionsPage.dart';
 
+/*
+The `DoctorHomePage` in this code provides a dashboard for doctors to manage prescriptions and patients. 
+It displays a list of prescriptions that are about to end, with filters for patient ID and days left until the prescription expires. 
+The doctor can also add new patients, manage prescriptions, and track medicine intake for patients. Additionally, there is functionality to renew prescriptions through a pop-up dialog, where the doctor can edit details such as daily dose, pills per dose, and prescription dates. 
+The app supports navigation between different pages using a bottom navigation bar, including options to log out and refresh the page.
+*/
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
