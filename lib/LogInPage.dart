@@ -7,6 +7,14 @@ import 'doctorHomePage.dart'; // Import the DoctorHomePage
 import 'survey.dart'; // Import the Survey page
 import 'forgetPassword.dart';
 
+/* 
+ login interface for both patients and doctors, allowing them to enter their ID and password. 
+Based on the login credentials, it verifies the user against Firebase Firestore and navigates them either to the patient's `HomePage`, 
+the doctor's `DoctorHomePage`, or a survey screen if it is their first login. It includes features such as password visibility toggle,
+ forgot password functionality, and validation for incorrect credentials.
+ The interface also offers a gradient-styled login button and handles any errors or incorrect inputs during the login process.
+*/
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
