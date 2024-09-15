@@ -7,6 +7,11 @@ import 'MyMedicines.dart';
 import 'UserProfile.dart';
 import 'TakeORMiss.dart';
 
+// The user is presented with a home page where they can view today's medication list,
+// see detailed information about their medications, and navigate to other sections such as profile,
+// medicines, and statistics. The page retrieves the user's medication data from a Firestore database and displays relevant warnings,
+// side effects, and images for each medication.
+
 class HomePage extends StatefulWidget {
   final String userId;
 
