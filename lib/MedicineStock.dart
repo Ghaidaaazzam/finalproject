@@ -4,6 +4,10 @@ import 'package:flutter/services.dart'; // Add this import for rootBundle
 import 'package:intl/intl.dart';
 import 'dart:convert'; // Add this import for LineSplitter
 
+// The user is presented with a medicine stock tracking interface that displays detailed information about their current medications,
+// including the form, total pills left, and expected end date based on daily dosage and pill intake.
+// The interface fetches prescription data from a Firestore database and provides visual representation through images and text.
+
 class MedicineStock extends StatefulWidget {
   final String userId;
 

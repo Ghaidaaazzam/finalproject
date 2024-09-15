@@ -4,6 +4,9 @@ import 'HomePage.dart'; // Import HomePage
 import 'UserProfile.dart';
 import 'MyMedicines.dart';
 
+// The app displays detailed information about the patient's medication history, including intake dates,
+// missed doses, and taken doses.
+
 class MedicineIntakePage extends StatefulWidget {
   final String patientId;
 

@@ -6,6 +6,13 @@ import 'package:timezone/timezone.dart' as tz;
 import 'package:flutter/services.dart'; // Add this import for rootBundle
 import 'dart:convert'; // Add this import for LineSplitter
 
+// The NotificationHelper class provides a system for managing medication reminders through local notifications.
+// It schedules notifications for specific times, displays pop-ups when it's time to take medicine,
+// and updates the medication intake status in Firestore.
+// The class handles app lifecycle states to cancel or reschedule notifications based on whether the app is in the foreground or background.
+// Additionally, it supports user interactions for rescheduling notifications or marking medicines as taken or missed,
+// while updating the corresponding data in Firestore.
+
 class NotificationHelper with WidgetsBindingObserver {
   late FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
   late BuildContext context;

@@ -8,6 +8,10 @@ import 'HomePage.dart'; // Import HomePage
 import 'notification_helper.dart'; // Import NotificationHelper
 import 'MedicineStock.dart'; // Import MedicineStock
 
+// The user is presented with a medication management interface that allows them to view detailed information about their prescriptions,
+// set reminders for medication times, and track their intake. The page provides navigation to other sections,
+// such as home, profile, and medicine stock, while displaying prescription data and facilitating interaction with medicine reminders.
+
 class MyMedicines extends StatefulWidget {
   final String userId;
 
